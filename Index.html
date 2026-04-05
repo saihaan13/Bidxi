@@ -1,0 +1,760 @@
+Perfect — here’s a **Phase 0 scaffold prompt** you should run *before* Phase 1.
+
+---
+
+## Phase 0 Prompt (Architecture scaffold only, no full gameplay yet)
+
+Build a **single-file HTML/CSS/JS scaffold** for **BidXI** that is stable, extensible, and ready for later Phase 1/2/3 feature drops.
+
+### Absolute technical constraints
+- Exactly **one `<script>` block** in the file
+- All globals declared **once at top** before any function
+- No duplicate `let`/`const` declarations anywhere
+- No external dependencies except Google Fonts: Orbitron + Rajdhani
+- Mobile-first, portrait orientation, touch targets ≥44px
+- Must work offline after initial load
+- Every `onclick="..."` function referenced in HTML must exist in script
+- No early/orphan `</script>` tags
+- `let M = {}, G = {};` must exist in globals block
+
+### Phase 0 goal
+Create a **working shell architecture** with placeholder logic and minimal mock data.  
+Do **not** implement full auction/season/match intelligence yet.
+
+---
+
+### 1) File structure and UI scaffold (required)
+Implement screens with IDs exactly:
+
+- `screen-home`
+- `screen-teamsel`
+- `screen-match`
+- `screen-auction`
+- `screen-season`
+- `screen-stats`
+- `screen-cosmetics`
+
+Use `.screen { display:none }` and `.screen.active { display:flex }`.
+
+Include:
+- Global top header/title
+- Footer legal disclaimer on every screen:
+  - `⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.`
+
+---
+
+### 2) CSS system scaffold (required)
+Define CSS variables from spec:
+`--bg --panel --panel2 --navy --navyb --red --red2 --gold --gold2 --green --blue --orange --purple --border --text --muted`
+
+Add:
+- Dark navy/purple themed layout
+- Reusable utility classes: panel, btn, btn-primary, btn-danger, badge, row, col
+- Responsive two-column match area that collapses on narrow widths
+- Touch-friendly button sizing and spacing
+- Basic animation classes (`fadeUp`, pulse placeholder)
+
+---
+
+### 3) JavaScript declaration order (required)
+Inside the single script block, enforce this top-down order:
+
+1. Constants (`RC`, `CIRC`, etc.)
+2. **All globals**
+3. IPL data containers (minimal seeded data for now)
+4. `IPL_META` placeholder
+5. `PALL` placeholder
+6. `FIELD_POS` placeholder
+7. `H2H` placeholder
+8. Utility functions
+9. Navigation/home functions
+10. Team selection placeholder functions
+11. Auction placeholder functions
+12. Toss/match init placeholders
+13. Pitch render placeholder
+14. Bat panel placeholder
+15. Bowl panel placeholder
+16. Match sim placeholder
+17. Skip placeholder
+18. Field modal placeholder
+19. Bottom bar handlers
+20. Season placeholder
+21. Orange/Purple placeholder
+22. Stats placeholder
+23. `buildStats()` placeholder at end
+
+---
+
+### 4) Required global variables
+Declare (once only) at top:
+- `let gameMode`
+- `let M = {}, G = {}`
+- `let GA = {}`
+- `let dragFrom = null`
+- `let activeFielders = []`
+- `let batControls = {}`
+- `let bowlControls = {}`
+- `let autoPlay = true`
+- `let highlightsOn = true`
+- `let selectedTeam = null`
+- `let selectedXI = []`
+- `let importedNames = {}`
+- plus any other needed globals, but no duplicates
+
+---
+
+### 5) Minimal data seed (required)
+Use tiny but valid seed data now:
+- 2 teams only for scaffold testing (e.g., CSK + MI), each with 12+ players
+- Each player object must already follow final schema keys:
+  `name, role, emoji, hand, bat, bowl, bat_avg, bat_sr, bowl_avg, bowl_econ, wkts, inns, overs, form, fitness, cap`
+- `pn(player)` helper must support imported name mapping by code/name
+
+---
+
+### 6) Functional scaffold behavior (required)
+Implement basic working behavior:
+
+#### Home
+- Buttons for Quick Play / Season / Mini Auction / Mega Auction / Stats / Cosmetics
+- For unimplemented modes, show toast “Coming in next phase”
+
+#### Team selection
+- Show players table/list
+- Tap to toggle selected XI
+- Show selected count `x/11`
+- Validate:
+  - exactly 11 required
+  - max 4 overseas (`cap===true` or star marker)
+- “Play Match” button disabled until valid XI
+
+#### Match screen (placeholder engine)
+- Render static scoreboard area
+- Render pitch canvas with simple drawing (ground + pitch + stick figures placeholder)
+- Bottom control bar with 8 buttons wired to existing functions
+- `Next Ball` mutates mock score/balls so UI updates visibly
+- `Play Over` runs 6 mock balls
+- `AUTO` toggle flips state and badge text
+- `HIGHLIGHTS` toggle flips state and badge text
+- `Skip Inn` and `Skip Match` show toasts and mock-finish result modal
+
+---
+
+### 7) Modal & toast framework (required)
+Create reusable:
+- `toast(msg, type)`
+- generic modal open/close helpers
+- confirm/cancel button style system
+
+---
+
+### 8) Local storage scaffold (required)
+Persist and load:
+- selected cosmetic skin (`bidxi_skin`)
+- imported names mapping (`bidxi_names`)
+- last selected team (`bidxi_team`)
+
+No payment code.
+
+---
+
+### 9) Debug/self-test block (required)
+At bottom, add `runSelfTest()` called once on load that checks:
+- Only expected screen IDs exist
+- Required onclick functions exist on `window`
+- No duplicate selection in XI
+- `M` and `G` objects are initialized
+- Logs pass/fail summary to console
+
+---
+
+### 10) Output rules
+- Return **only complete HTML code**
+- No markdown fences
+- No explanation text
+
+---
+
+### Definition of done for Phase 0
+- [ ] Single-file HTML runs without console errors
+- [ ] Navigation across scaffold screens works
+- [ ] Team select validation works (11 + overseas cap)
+- [ ] Match placeholder controls visibly update state
+- [ ] Self-test prints PASS for core checks
+- [ ] Clean base ready for Phase 1 implementation
+
+---
+
+If you want, I can also give you a **“Phase 1 patch prompt”** version that tells Codex to *edit this Phase 0 file in-place* instead of regenerating from scratch (much safer).
+Great — here’s the **Phase 1 patch prompt** (in-place edit style, safest workflow).
+
+---
+
+Use this exact prompt with Codex/Claude Code:
+
+Take my existing **BidXI Phase 0 single-file HTML** and **patch it in-place** to implement **Phase 1 playable core**.  
+Do **not** rewrite from scratch. Preserve existing IDs, globals, helper names, and screen structure unless absolutely necessary.
+
+## Hard constraints (must pass)
+1. Exactly **one `<script>` block** in final file
+2. Keep all global declarations at top, before any function
+3. No duplicate `let/const` declarations
+4. No orphan/extra `</script>`
+5. Every `onclick` function referenced in HTML must exist
+6. Mobile portrait-first, touch targets ≥44px
+7. Offline compatible
+8. Keep `let M = {}, G = {};` globals intact
+9. Keep existing screen IDs:
+   - `screen-home`
+   - `screen-teamsel`
+   - `screen-match`
+   - `screen-auction`
+   - `screen-season`
+   - `screen-stats`
+   - `screen-cosmetics`
+
+## Scope: implement Phase 1 only
+Implement fully playable **Quick Play** flow:
+
+### A) Team + XI selection
+- Expand seed data from 2 teams to all 10 IPL teams (can keep abbreviated squads if needed, but minimum 15 players/team)
+- Each player object must use schema:
+  `name, role, emoji, hand, bat, bowl, bat_avg, bat_sr, bowl_avg, bowl_econ, wkts, inns, overs, form, fitness, cap`
+- Team selection from home → team select screen
+- Tap player rows/cards to select XI
+- Enforce:
+  - exactly 11 players
+  - max 4 overseas players (`cap===true`)
+- Show live badge `x/11`
+- “Play Match” enabled only when valid XI
+- Keep toast errors for invalid composition
+
+### B) Toss + match initialization
+- Add toss modal/step:
+  - coin result
+  - toss winner chooses bat/bowl (simple random acceptable)
+- Initialize innings state:
+  - batting team, bowling team
+  - striker/non-striker
+  - current bowler
+  - score/wickets/overs/balls
+  - target in second innings
+
+### C) Match UI (real, not placeholder)
+Keep current layout but make it functional:
+- Top scoreboard updates every ball
+- Left:
+  - pitch canvas redraw each update
+  - commentary grid (6-ball cells per over)
+  - commentary text line
+- Right:
+  - striker/non-striker panels with runs/balls/SR
+  - current bowler mini-card (overs/runs/wkts/econ)
+- Bottom 8 controls all wired:
+  - Menu (can be minimal back-confirm)
+  - Field (toast “Phase 3” ok for now)
+  - Highlights toggle
+  - Auto toggle
+  - Next Ball
+  - Play Over
+  - Skip Innings
+  - Skip Match
+
+### D) Ball engine (required formulas)
+Use these formulas each legal ball:
+
+- `effectiveAggr = max(1, aggr - (defensive/10)*3)`
+- `ppBonus = 1.12` in overs 1–6, else `1.0`
+- `wicketChance = 5 + (bowlRating - batRating)*0.12 + (effectiveAggr-5)*1.2`
+- `sixChance = (1.5 + batRating*0.025*aggr/5) * ppBonus`
+- `fourChance = (6 + batRating*0.07*aggr/5) * ppBonus`
+- No-ball + wide combined around `2.8%`
+- Remaining probability distributed to dot/1/2/3 logically
+
+Also implement:
+- Strike rotation
+- Over completion every 6 legal balls
+- Over-end bowler change (simple auto-select)
+- Bowler max 4 overs
+- No consecutive overs by same bowler
+- Innings end conditions (20 overs or all out, chase target reached)
+
+### E) Modes & speed controls
+- `AUTO` default ON: continuous ball simulation loop
+- When AUTO OFF: user must tap Next Ball/Play Over
+- `HIGHLIGHTS` default ON:
+  - dots/1/2 fast delay (~60ms)
+  - 4/6/W slower dramatic delay (~1200ms)
+- Toggle buttons should visibly indicate ON/OFF
+
+### F) Skip actions
+- Skip Innings:
+  - Simulate rest of current innings quickly using same engine
+- Skip Match:
+  - Simulate full remainder and show result modal
+
+### G) Result modal
+At match end show:
+- Winner and margin (runs or wickets)
+- Both innings scores
+- Player of the Match (simple heuristic: highest impact batting/bowling)
+
+### H) Keep placeholders for later phases
+Do not implement full systems yet; keep clean placeholders:
+- Auction advanced logic
+- Season fixtures/table/playoffs
+- Field placement modal interactions
+- Orange/Purple cap
+- Full statistics engine
+
+But ensure buttons/screens don’t break and show “Coming in next phase” where appropriate.
+
+## Data and balancing notes
+- Use realistic-ish ratings so stars perform better but randomness still matters
+- Ensure matches generally end in plausible T20 ranges (120–230)
+- Avoid runaway wicket rates or excessive 0-run spam
+
+## Regression requirements
+- Do not remove legal disclaimer footer
+- Do not break localStorage keys from Phase 0 (`bidxi_skin`, `bidxi_names`, `bidxi_team`)
+- Keep `pn()` mapping support intact
+- Keep `runSelfTest()` and extend checks for:
+  - match state init validity
+  - overs never exceed 20
+  - wickets never exceed 10
+  - no duplicate globals introduced
+
+## Output format
+- Return only the full updated HTML file
+- No markdown fences
+- No explanatory text
+
+## Final self-check before output
+Mentally verify:
+- new Function(JS) would parse
+- all referenced functions exist
+- only one script block exists
+- no duplicate declarations
+- Quick Play is fully playable from Home → XI → Toss → Match → Result
+
+---
+
+If you want, I can now also give you a **Phase 2 patch prompt (in-place)** in the same style so you can chain it right after this.
+Take my existing **BidXI Phase 1 single-file HTML** and **patch it in-place** to implement **Phase 2 Auction systems**.  
+Do **not** rewrite from scratch. Preserve current architecture, IDs, globals, helper naming style, and working Quick Play flow.
+
+## Hard constraints (must pass)
+1. Exactly **one `<script>` block** in final file
+2. All globals declared once at top before any function
+3. No duplicate `let/const` declarations
+4. No orphan/extra `</script>`
+5. Every `onclick` referenced in HTML must exist
+6. Mobile portrait-first, touch targets ≥44px
+7. Offline-compatible
+8. Keep `let M = {}, G = {};` intact
+9. Do not break existing screen IDs or working Phase 1 match flow
+
+## Goal of this patch
+Add fully playable **Mini Auction** and **Mega Auction** modes, including retention, purse logic, bidding, countdown ring, RTM challenge, and auction completion to playable squads.
+
+---
+
+## A) Modes and config
+
+### Mini Auction
+- Teams: 4
+- Purse: ₹30 Cr each
+- Retentions: any number allowed
+- RTM cards: each retained player gives 1 RTM
+
+### Mega Auction
+- Teams: 8
+- Purse: ₹90 Cr each
+- Max retentions considered for RTM conversion:
+  - 3 retained => 3 RTM
+  - 4 retained => 2 RTM
+  - 5 or more retained => 0 RTM
+- Enforce sensible squad size target (e.g., 15–20) for auction completion
+
+Add clear mode summary panel before auction starts.
+
+---
+
+## B) Data requirements
+
+1. Keep IPL team/squad data from Phase 1
+2. Add `PALL` auction player pool with **25 fictional coded players** only (no real names), each object:
+   - `id, code, role, emoji, country, bat, bowl, avg, sr, wkts, baseL, set`
+3. Include set ordering constants:
+   - `Marquee`
+   - `Bat Pool 1`
+   - `All-Rounder Pool 1`
+   - `Fast Bowl Pool 1`
+   - `Spin Pool 1`
+   - `Bat Pool 2`
+   - `All-Rounder Pool 2`
+   - `Fast Bowl Pool 2`
+   - `Spin Pool 2`
+4. Base price guidance:
+   - Marquee: ₹200L
+   - Pool 1: ₹100–150L
+   - Pool 2: ₹30–75L
+
+---
+
+## C) Auction flow screens/sections
+
+Patch `screen-auction` to include:
+
+1. **Top bar**
+   - Current mode (Mini/Mega)
+   - Current set name
+   - Player index in set/pool
+
+2. **Current player card**
+   - Emoji avatar
+   - Coded name + country
+   - Role pill color-coded (BAT/FAST/ALL-R/WK/SPIN)
+   - Stat boxes: Avg, SR, Wkts, Base
+   - Bat/Bowl rating bars
+
+3. **Countdown ring (SVG, 5 sec)**
+   - Circular progress
+   - Color shift green → gold → red with time
+   - Resets each player
+
+4. **Bid controls/log**
+   - Current bid + leading team
+   - Scrollable chronological bid log
+   - Buttons: Bid (human), Skip Player, Skip Set
+
+5. **Team purse/squad panel**
+   - Per-team purse left
+   - Squad count
+   - Progress bars
+   - RTM cards remaining
+
+6. **Player pool grid**
+   - All pool players visible with status badge:
+     - SOLD
+     - UNSOLD
+     - SKIP
+
+---
+
+## D) Retention system
+
+Before live bidding starts:
+
+1. Retention step by team:
+   - Show base squad list
+   - Toggle retain/release players
+2. Deduct retention cost from purse (define clear deterministic formula and show it in UI)
+3. Compute RTM cards per mode rules above
+4. Persist retained players as locked to that team
+5. Prevent retained players from appearing in live auction pool
+
+---
+
+## E) Bidding engine (required behavior)
+
+Implement AI bidding with heuristics:
+- Evaluate player fit using:
+  - role scarcity in current squad
+  - bat/bowl rating
+  - remaining purse
+  - current squad size
+- AI should not bid if:
+  - purse insufficient
+  - squad already full
+  - valuation threshold exceeded
+- Increment bids in sensible steps based on current price range
+- Add “accelerated auction” behavior:
+  - once a team has >=10 players, bid only for high-need roles/targets
+- Unsold logic:
+  - if no bid by timeout, mark UNSOLD
+- Skip Set:
+  - mark remaining players in current set as SKIP (not SOLD/UNSOLD confusion)
+
+---
+
+## F) RTM challenge logic (required)
+
+When a released player is sold to another team and original team has RTM:
+- Open modal: **RTM Challenge — Match or Pass**
+- If Match:
+  - original team gets player at final bid price
+  - purse deduction applied
+  - RTM decreases by 1
+  - remove player from buying team
+- If Pass:
+  - sale remains with buying team
+- Validate purse before allowing Match
+
+---
+
+## G) Auction completion and handoff
+
+On completion:
+1. Finalize squads per team
+2. Ensure each team has valid squad count minimum
+3. Allow user to:
+   - View final squads summary
+   - Continue to toss + match (Phase 1 engine) with chosen auction team
+4. Persist auction results in state so they can be revisited
+
+---
+
+## H) UX + safeguards
+
+- Toasts for key events:
+  - bid placed
+  - sold
+  - unsold
+  - RTM used
+  - insufficient purse
+- Disable invalid buttons contextually
+- Prevent purse from going negative (hard guard)
+- Prevent duplicate ownership of same player
+- Keep app responsive during auto-bidding/countdown
+
+---
+
+## I) Non-goals in this patch
+
+Do not fully implement yet:
+- Season fixtures/points/playoffs
+- Orange/Purple cap full tracking
+- Advanced field placement interactions
+- Cosmetics unlock shop logic (Phase 3)
+
+Use stable placeholders: “Coming in next phase”.
+
+---
+
+## J) Regression requirements
+
+Must keep working from Phase 1:
+- Quick Play complete match flow
+- Toss → innings → result modal
+- Auto/highlights toggles
+- Skip innings/match
+- LocalStorage keys:
+  - `bidxi_skin`
+  - `bidxi_names`
+  - `bidxi_team`
+- `pn()` mapping support unchanged
+- legal disclaimer footer on screens
+
+---
+
+## K) Extend self-test (`runSelfTest()`)
+
+Add checks:
+1. Auction mode config exists for mini/mega
+2. `PALL` has 25 valid players with required keys
+3. No player can be sold twice
+4. Team purse never below zero
+5. RTM cannot go negative
+6. Countdown ring function exists and updates stroke/progress
+7. All auction onclick handlers resolve to functions
+
+Log PASS/FAIL summary clearly.
+
+---
+
+## Output format
+- Return only the full updated HTML file
+- No markdown fences
+- No explanation text
+
+## Final pre-output validation
+Mentally verify:
+- JS parses cleanly with `new Function(allJS)`
+- one script block only
+- no duplicate declarations
+- Mini and Mega auctions are playable end-to-end
+- Phase 1 gameplay still works without regressions
+Great choice. Here’s a **Phase-split master prompt set** you can paste to Codex/Claude Code one phase at a time.
+
+---
+
+## Phase 1 Prompt (Core playable match + UI foundation)
+
+Build a **single-file offline HTML/CSS/JS** mobile game called **BidXI** (IPL-style simulator), portrait-first, Chrome mobile compatible.
+
+### Hard constraints
+- Exactly **one `<script>` block**
+- All globals declared **once at top** before any function
+- No duplicate `let/const`
+- No external libs (only Google Fonts Orbitron + Rajdhani)
+- All `onclick` handlers must map to real functions
+- Must run offline
+
+### Deliver in this phase
+1. **Home screen**
+   - Buttons: Quick Play, IPL Season (locked badge), Mini Auction (locked), Mega Auction (locked)
+   - Team picker for Quick Play only (10 teams)
+2. **Squad selection screen (CC-inspired simplified)**
+   - Scrollable table with columns: #, Player, Role, Form, Fitness, Bat, Bowl
+   - Tap row to select
+   - Show selected count `x/11`
+   - Enforce max 11, min 11 to continue
+   - Enforce max 4 overseas in XI
+3. **Toss + innings setup**
+   - Toss winner and decision
+4. **Match screen base layout**
+   - Top scoreboard bar
+   - Left: pitch canvas + commentary grid + commentary line
+   - Right: batting/bowling info panels
+   - Bottom 8 control buttons (UI only okay for some in Phase 1, but all render)
+5. **Core ball engine (required)**
+   - Use the probability formulas provided in original spec
+   - Simulate legal ball outcomes + wides/no-balls
+   - Track score, wickets, overs, striker/non-striker swap, over completion
+   - 2 innings, target chase, winner
+6. **Controls**
+   - Next Ball
+   - Play Over
+   - Auto toggle on/off
+   - Highlights toggle (skip dot/1/2 faster)
+   - Skip Innings
+7. **Basic result modal**
+   - Winner + margin
+   - Player of match heuristic
+8. **Data**
+   - Include all 10 IPL teams and squads (can use simplified stat values in Phase 1 but structure must match final schema)
+9. **Legal footer**
+   - “⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.”
+
+### Non-goals for Phase 1
+- No auction logic yet
+- No season fixtures/table yet
+- No field placement modal yet
+- No Orange/Purple cap yet
+- No import JSON yet
+
+### Required output format
+- Output only one complete HTML file
+- No explanation text before/after code
+
+### Phase 1 acceptance checklist
+- [ ] One script block only
+- [ ] No duplicate globals
+- [ ] Match can be fully completed from toss to result
+- [ ] Overseas rule enforced on XI selection
+- [ ] Works offline after first load
+
+---
+
+## Phase 2 Prompt (Auction systems + retention + pools)
+
+Take the existing Phase 1 file and **extend it** (do not rewrite architecture).
+
+### Hard constraints
+- Keep one script block
+- Preserve all working Phase 1 behavior
+- No duplicate declarations
+
+### Deliver in this phase
+1. **Mini Auction mode**
+   - 4 teams, ₹30 Cr each
+   - Retention flow: retain any number, each retained = 1 RTM
+   - 25 coded fictional auction players
+   - Set order support (Marquee, Bat P1, All-R P1, etc.)
+2. **Mega Auction mode**
+   - 8 teams, ₹90 Cr each
+   - Retention cap logic: 3 kept=3 RTM, 4 kept=2 RTM, 5+=0 RTM
+3. **Auction UI**
+   - Current player card with role, ratings, base price
+   - Team purse bars
+   - Bid log
+   - SOLD/UNSOLD/SKIP badges
+   - Skip Player + Skip Set buttons
+4. **Bid engine**
+   - AI bidding based on role need + purse + squad size
+   - 5-second countdown ring (SVG) color transitions green→gold→red
+   - Accelerated auction behavior once squads near completion
+5. **RTM popup**
+   - Match / Pass
+   - Apply retention constraints
+6. **Auction completion**
+   - Build final squads and allow transition to toss/match
+
+### Non-goals for Phase 2
+- Season fixtures and playoffs can remain locked
+- Orange/Purple cap can remain placeholder
+
+### Phase 2 acceptance checklist
+- [ ] Mini and Mega auction both playable end-to-end
+- [ ] Purse never goes negative
+- [ ] RTM rules enforced per mode
+- [ ] Countdown + bid log visible and functional
+- [ ] No Phase 1 regressions
+
+---
+
+## Phase 3 Prompt (Season mode + leaderboards + advanced systems + monetizable cosmetics shell)
+
+Extend the Phase 2 file.
+
+### Deliver in this phase
+1. **IPL Season mode**
+   - 10 teams, 74 matches
+   - Double round-robin league fixtures
+   - Points table: P/W/L/NRR/Pts
+   - Top 4 playoffs: Q1, Eliminator, Q2, Final
+2. **AI vs AI simulation**
+   - Use hardcoded H2H + team strength + variance
+   - Auto-update fixtures/results/table
+3. **Orange Cap + Purple Cap**
+   - Track all teams/all matches continuously
+4. **Field placement modal**
+   - SVG field with legal positions
+   - Move fielders by tap-select and tap-destination
+   - Keeper fixed
+   - Powerplay max 2 outside ring
+5. **Impact player**
+   - Enable after first wicket
+   - Select from non-playing squad
+6. **Import real names JSON**
+   - `{ code: realName }` mapping
+   - `pn()` helper integration throughout
+7. **Statistics screen**
+   - Career records + match history
+8. **Polish**
+   - Toasts
+   - Powerplay badge
+   - Stamina bar behavior
+   - Commentary animations for 4/6/W
+
+### Cosmetics / monetization-ready shell (your requested part)
+Add a **non-intrusive framework only** (no payment integration):
+- `skins` data model for player avatar themes:
+  - default
+  - cricket-warrior
+  - futuristic-pro
+- unlock state in localStorage
+- “Cosmetics” screen with:
+  - Preview selected skin style on stick-figure/player card
+  - Locked/unlocked states
+  - “Battle Pass Coming Soon” placeholder button
+  - “In-app purchases not enabled in this demo” disclaimer
+- Ensure gameplay remains fully functional without cosmetics
+
+### Guardrails
+- No real-money or payment SDK code
+- No dark patterns
+- Cosmetics purely visual
+
+### Phase 3 acceptance checklist
+- [ ] Full season playable to champion
+- [ ] Caps + stats update correctly
+- [ ] Field modal enforces rules
+- [ ] Cosmetics system persists selection in localStorage
+- [ ] Demo disclaimer shown for monetization placeholders
+
+---
+
+If you want, I can also give you a **Phase 0 “refactor-safe scaffold prompt”** that forces Codex to first generate a clean architecture skeleton before Phase 1 (this reduces giant-file breakage a lot).
+  
