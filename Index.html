@@ -1,760 +1,1462 @@
-Perfect — here’s a **Phase 0 scaffold prompt** you should run *before* Phase 1.
-
----
-
-## Phase 0 Prompt (Architecture scaffold only, no full gameplay yet)
-
-Build a **single-file HTML/CSS/JS scaffold** for **BidXI** that is stable, extensible, and ready for later Phase 1/2/3 feature drops.
-
-### Absolute technical constraints
-- Exactly **one `<script>` block** in the file
-- All globals declared **once at top** before any function
-- No duplicate `let`/`const` declarations anywhere
-- No external dependencies except Google Fonts: Orbitron + Rajdhani
-- Mobile-first, portrait orientation, touch targets ≥44px
-- Must work offline after initial load
-- Every `onclick="..."` function referenced in HTML must exist in script
-- No early/orphan `</script>` tags
-- `let M = {}, G = {};` must exist in globals block
-
-### Phase 0 goal
-Create a **working shell architecture** with placeholder logic and minimal mock data.  
-Do **not** implement full auction/season/match intelligence yet.
-
----
-
-### 1) File structure and UI scaffold (required)
-Implement screens with IDs exactly:
-
-- `screen-home`
-- `screen-teamsel`
-- `screen-match`
-- `screen-auction`
-- `screen-season`
-- `screen-stats`
-- `screen-cosmetics`
-
-Use `.screen { display:none }` and `.screen.active { display:flex }`.
-
-Include:
-- Global top header/title
-- Footer legal disclaimer on every screen:
-  - `⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.`
-
----
-
-### 2) CSS system scaffold (required)
-Define CSS variables from spec:
-`--bg --panel --panel2 --navy --navyb --red --red2 --gold --gold2 --green --blue --orange --purple --border --text --muted`
-
-Add:
-- Dark navy/purple themed layout
-- Reusable utility classes: panel, btn, btn-primary, btn-danger, badge, row, col
-- Responsive two-column match area that collapses on narrow widths
-- Touch-friendly button sizing and spacing
-- Basic animation classes (`fadeUp`, pulse placeholder)
-
----
-
-### 3) JavaScript declaration order (required)
-Inside the single script block, enforce this top-down order:
-
-1. Constants (`RC`, `CIRC`, etc.)
-2. **All globals**
-3. IPL data containers (minimal seeded data for now)
-4. `IPL_META` placeholder
-5. `PALL` placeholder
-6. `FIELD_POS` placeholder
-7. `H2H` placeholder
-8. Utility functions
-9. Navigation/home functions
-10. Team selection placeholder functions
-11. Auction placeholder functions
-12. Toss/match init placeholders
-13. Pitch render placeholder
-14. Bat panel placeholder
-15. Bowl panel placeholder
-16. Match sim placeholder
-17. Skip placeholder
-18. Field modal placeholder
-19. Bottom bar handlers
-20. Season placeholder
-21. Orange/Purple placeholder
-22. Stats placeholder
-23. `buildStats()` placeholder at end
-
----
-
-### 4) Required global variables
-Declare (once only) at top:
-- `let gameMode`
-- `let M = {}, G = {}`
-- `let GA = {}`
-- `let dragFrom = null`
-- `let activeFielders = []`
-- `let batControls = {}`
-- `let bowlControls = {}`
-- `let autoPlay = true`
-- `let highlightsOn = true`
-- `let selectedTeam = null`
-- `let selectedXI = []`
-- `let importedNames = {}`
-- plus any other needed globals, but no duplicates
-
----
-
-### 5) Minimal data seed (required)
-Use tiny but valid seed data now:
-- 2 teams only for scaffold testing (e.g., CSK + MI), each with 12+ players
-- Each player object must already follow final schema keys:
-  `name, role, emoji, hand, bat, bowl, bat_avg, bat_sr, bowl_avg, bowl_econ, wkts, inns, overs, form, fitness, cap`
-- `pn(player)` helper must support imported name mapping by code/name
-
----
-
-### 6) Functional scaffold behavior (required)
-Implement basic working behavior:
-
-#### Home
-- Buttons for Quick Play / Season / Mini Auction / Mega Auction / Stats / Cosmetics
-- For unimplemented modes, show toast “Coming in next phase”
-
-#### Team selection
-- Show players table/list
-- Tap to toggle selected XI
-- Show selected count `x/11`
-- Validate:
-  - exactly 11 required
-  - max 4 overseas (`cap===true` or star marker)
-- “Play Match” button disabled until valid XI
-
-#### Match screen (placeholder engine)
-- Render static scoreboard area
-- Render pitch canvas with simple drawing (ground + pitch + stick figures placeholder)
-- Bottom control bar with 8 buttons wired to existing functions
-- `Next Ball` mutates mock score/balls so UI updates visibly
-- `Play Over` runs 6 mock balls
-- `AUTO` toggle flips state and badge text
-- `HIGHLIGHTS` toggle flips state and badge text
-- `Skip Inn` and `Skip Match` show toasts and mock-finish result modal
-
----
-
-### 7) Modal & toast framework (required)
-Create reusable:
-- `toast(msg, type)`
-- generic modal open/close helpers
-- confirm/cancel button style system
-
----
-
-### 8) Local storage scaffold (required)
-Persist and load:
-- selected cosmetic skin (`bidxi_skin`)
-- imported names mapping (`bidxi_names`)
-- last selected team (`bidxi_team`)
-
-No payment code.
-
----
-
-### 9) Debug/self-test block (required)
-At bottom, add `runSelfTest()` called once on load that checks:
-- Only expected screen IDs exist
-- Required onclick functions exist on `window`
-- No duplicate selection in XI
-- `M` and `G` objects are initialized
-- Logs pass/fail summary to console
-
----
-
-### 10) Output rules
-- Return **only complete HTML code**
-- No markdown fences
-- No explanation text
-
----
-
-### Definition of done for Phase 0
-- [ ] Single-file HTML runs without console errors
-- [ ] Navigation across scaffold screens works
-- [ ] Team select validation works (11 + overseas cap)
-- [ ] Match placeholder controls visibly update state
-- [ ] Self-test prints PASS for core checks
-- [ ] Clean base ready for Phase 1 implementation
-
----
-
-If you want, I can also give you a **“Phase 1 patch prompt”** version that tells Codex to *edit this Phase 0 file in-place* instead of regenerating from scratch (much safer).
-Great — here’s the **Phase 1 patch prompt** (in-place edit style, safest workflow).
-
----
-
-Use this exact prompt with Codex/Claude Code:
-
-Take my existing **BidXI Phase 0 single-file HTML** and **patch it in-place** to implement **Phase 1 playable core**.  
-Do **not** rewrite from scratch. Preserve existing IDs, globals, helper names, and screen structure unless absolutely necessary.
-
-## Hard constraints (must pass)
-1. Exactly **one `<script>` block** in final file
-2. Keep all global declarations at top, before any function
-3. No duplicate `let/const` declarations
-4. No orphan/extra `</script>`
-5. Every `onclick` function referenced in HTML must exist
-6. Mobile portrait-first, touch targets ≥44px
-7. Offline compatible
-8. Keep `let M = {}, G = {};` globals intact
-9. Keep existing screen IDs:
-   - `screen-home`
-   - `screen-teamsel`
-   - `screen-match`
-   - `screen-auction`
-   - `screen-season`
-   - `screen-stats`
-   - `screen-cosmetics`
-
-## Scope: implement Phase 1 only
-Implement fully playable **Quick Play** flow:
-
-### A) Team + XI selection
-- Expand seed data from 2 teams to all 10 IPL teams (can keep abbreviated squads if needed, but minimum 15 players/team)
-- Each player object must use schema:
-  `name, role, emoji, hand, bat, bowl, bat_avg, bat_sr, bowl_avg, bowl_econ, wkts, inns, overs, form, fitness, cap`
-- Team selection from home → team select screen
-- Tap player rows/cards to select XI
-- Enforce:
-  - exactly 11 players
-  - max 4 overseas players (`cap===true`)
-- Show live badge `x/11`
-- “Play Match” enabled only when valid XI
-- Keep toast errors for invalid composition
-
-### B) Toss + match initialization
-- Add toss modal/step:
-  - coin result
-  - toss winner chooses bat/bowl (simple random acceptable)
-- Initialize innings state:
-  - batting team, bowling team
-  - striker/non-striker
-  - current bowler
-  - score/wickets/overs/balls
-  - target in second innings
-
-### C) Match UI (real, not placeholder)
-Keep current layout but make it functional:
-- Top scoreboard updates every ball
-- Left:
-  - pitch canvas redraw each update
-  - commentary grid (6-ball cells per over)
-  - commentary text line
-- Right:
-  - striker/non-striker panels with runs/balls/SR
-  - current bowler mini-card (overs/runs/wkts/econ)
-- Bottom 8 controls all wired:
-  - Menu (can be minimal back-confirm)
-  - Field (toast “Phase 3” ok for now)
-  - Highlights toggle
-  - Auto toggle
-  - Next Ball
-  - Play Over
-  - Skip Innings
-  - Skip Match
-
-### D) Ball engine (required formulas)
-Use these formulas each legal ball:
-
-- `effectiveAggr = max(1, aggr - (defensive/10)*3)`
-- `ppBonus = 1.12` in overs 1–6, else `1.0`
-- `wicketChance = 5 + (bowlRating - batRating)*0.12 + (effectiveAggr-5)*1.2`
-- `sixChance = (1.5 + batRating*0.025*aggr/5) * ppBonus`
-- `fourChance = (6 + batRating*0.07*aggr/5) * ppBonus`
-- No-ball + wide combined around `2.8%`
-- Remaining probability distributed to dot/1/2/3 logically
-
-Also implement:
-- Strike rotation
-- Over completion every 6 legal balls
-- Over-end bowler change (simple auto-select)
-- Bowler max 4 overs
-- No consecutive overs by same bowler
-- Innings end conditions (20 overs or all out, chase target reached)
-
-### E) Modes & speed controls
-- `AUTO` default ON: continuous ball simulation loop
-- When AUTO OFF: user must tap Next Ball/Play Over
-- `HIGHLIGHTS` default ON:
-  - dots/1/2 fast delay (~60ms)
-  - 4/6/W slower dramatic delay (~1200ms)
-- Toggle buttons should visibly indicate ON/OFF
-
-### F) Skip actions
-- Skip Innings:
-  - Simulate rest of current innings quickly using same engine
-- Skip Match:
-  - Simulate full remainder and show result modal
-
-### G) Result modal
-At match end show:
-- Winner and margin (runs or wickets)
-- Both innings scores
-- Player of the Match (simple heuristic: highest impact batting/bowling)
-
-### H) Keep placeholders for later phases
-Do not implement full systems yet; keep clean placeholders:
-- Auction advanced logic
-- Season fixtures/table/playoffs
-- Field placement modal interactions
-- Orange/Purple cap
-- Full statistics engine
-
-But ensure buttons/screens don’t break and show “Coming in next phase” where appropriate.
-
-## Data and balancing notes
-- Use realistic-ish ratings so stars perform better but randomness still matters
-- Ensure matches generally end in plausible T20 ranges (120–230)
-- Avoid runaway wicket rates or excessive 0-run spam
-
-## Regression requirements
-- Do not remove legal disclaimer footer
-- Do not break localStorage keys from Phase 0 (`bidxi_skin`, `bidxi_names`, `bidxi_team`)
-- Keep `pn()` mapping support intact
-- Keep `runSelfTest()` and extend checks for:
-  - match state init validity
-  - overs never exceed 20
-  - wickets never exceed 10
-  - no duplicate globals introduced
-
-## Output format
-- Return only the full updated HTML file
-- No markdown fences
-- No explanatory text
-
-## Final self-check before output
-Mentally verify:
-- new Function(JS) would parse
-- all referenced functions exist
-- only one script block exists
-- no duplicate declarations
-- Quick Play is fully playable from Home → XI → Toss → Match → Result
-
----
-
-If you want, I can now also give you a **Phase 2 patch prompt (in-place)** in the same style so you can chain it right after this.
-Take my existing **BidXI Phase 1 single-file HTML** and **patch it in-place** to implement **Phase 2 Auction systems**.  
-Do **not** rewrite from scratch. Preserve current architecture, IDs, globals, helper naming style, and working Quick Play flow.
-
-## Hard constraints (must pass)
-1. Exactly **one `<script>` block** in final file
-2. All globals declared once at top before any function
-3. No duplicate `let/const` declarations
-4. No orphan/extra `</script>`
-5. Every `onclick` referenced in HTML must exist
-6. Mobile portrait-first, touch targets ≥44px
-7. Offline-compatible
-8. Keep `let M = {}, G = {};` intact
-9. Do not break existing screen IDs or working Phase 1 match flow
-
-## Goal of this patch
-Add fully playable **Mini Auction** and **Mega Auction** modes, including retention, purse logic, bidding, countdown ring, RTM challenge, and auction completion to playable squads.
-
----
-
-## A) Modes and config
-
-### Mini Auction
-- Teams: 4
-- Purse: ₹30 Cr each
-- Retentions: any number allowed
-- RTM cards: each retained player gives 1 RTM
-
-### Mega Auction
-- Teams: 8
-- Purse: ₹90 Cr each
-- Max retentions considered for RTM conversion:
-  - 3 retained => 3 RTM
-  - 4 retained => 2 RTM
-  - 5 or more retained => 0 RTM
-- Enforce sensible squad size target (e.g., 15–20) for auction completion
-
-Add clear mode summary panel before auction starts.
-
----
-
-## B) Data requirements
-
-1. Keep IPL team/squad data from Phase 1
-2. Add `PALL` auction player pool with **25 fictional coded players** only (no real names), each object:
-   - `id, code, role, emoji, country, bat, bowl, avg, sr, wkts, baseL, set`
-3. Include set ordering constants:
-   - `Marquee`
-   - `Bat Pool 1`
-   - `All-Rounder Pool 1`
-   - `Fast Bowl Pool 1`
-   - `Spin Pool 1`
-   - `Bat Pool 2`
-   - `All-Rounder Pool 2`
-   - `Fast Bowl Pool 2`
-   - `Spin Pool 2`
-4. Base price guidance:
-   - Marquee: ₹200L
-   - Pool 1: ₹100–150L
-   - Pool 2: ₹30–75L
-
----
-
-## C) Auction flow screens/sections
-
-Patch `screen-auction` to include:
-
-1. **Top bar**
-   - Current mode (Mini/Mega)
-   - Current set name
-   - Player index in set/pool
-
-2. **Current player card**
-   - Emoji avatar
-   - Coded name + country
-   - Role pill color-coded (BAT/FAST/ALL-R/WK/SPIN)
-   - Stat boxes: Avg, SR, Wkts, Base
-   - Bat/Bowl rating bars
-
-3. **Countdown ring (SVG, 5 sec)**
-   - Circular progress
-   - Color shift green → gold → red with time
-   - Resets each player
-
-4. **Bid controls/log**
-   - Current bid + leading team
-   - Scrollable chronological bid log
-   - Buttons: Bid (human), Skip Player, Skip Set
-
-5. **Team purse/squad panel**
-   - Per-team purse left
-   - Squad count
-   - Progress bars
-   - RTM cards remaining
-
-6. **Player pool grid**
-   - All pool players visible with status badge:
-     - SOLD
-     - UNSOLD
-     - SKIP
-
----
-
-## D) Retention system
-
-Before live bidding starts:
-
-1. Retention step by team:
-   - Show base squad list
-   - Toggle retain/release players
-2. Deduct retention cost from purse (define clear deterministic formula and show it in UI)
-3. Compute RTM cards per mode rules above
-4. Persist retained players as locked to that team
-5. Prevent retained players from appearing in live auction pool
-
----
-
-## E) Bidding engine (required behavior)
-
-Implement AI bidding with heuristics:
-- Evaluate player fit using:
-  - role scarcity in current squad
-  - bat/bowl rating
-  - remaining purse
-  - current squad size
-- AI should not bid if:
-  - purse insufficient
-  - squad already full
-  - valuation threshold exceeded
-- Increment bids in sensible steps based on current price range
-- Add “accelerated auction” behavior:
-  - once a team has >=10 players, bid only for high-need roles/targets
-- Unsold logic:
-  - if no bid by timeout, mark UNSOLD
-- Skip Set:
-  - mark remaining players in current set as SKIP (not SOLD/UNSOLD confusion)
-
----
-
-## F) RTM challenge logic (required)
-
-When a released player is sold to another team and original team has RTM:
-- Open modal: **RTM Challenge — Match or Pass**
-- If Match:
-  - original team gets player at final bid price
-  - purse deduction applied
-  - RTM decreases by 1
-  - remove player from buying team
-- If Pass:
-  - sale remains with buying team
-- Validate purse before allowing Match
-
----
-
-## G) Auction completion and handoff
-
-On completion:
-1. Finalize squads per team
-2. Ensure each team has valid squad count minimum
-3. Allow user to:
-   - View final squads summary
-   - Continue to toss + match (Phase 1 engine) with chosen auction team
-4. Persist auction results in state so they can be revisited
-
----
-
-## H) UX + safeguards
-
-- Toasts for key events:
-  - bid placed
-  - sold
-  - unsold
-  - RTM used
-  - insufficient purse
-- Disable invalid buttons contextually
-- Prevent purse from going negative (hard guard)
-- Prevent duplicate ownership of same player
-- Keep app responsive during auto-bidding/countdown
-
----
-
-## I) Non-goals in this patch
-
-Do not fully implement yet:
-- Season fixtures/points/playoffs
-- Orange/Purple cap full tracking
-- Advanced field placement interactions
-- Cosmetics unlock shop logic (Phase 3)
-
-Use stable placeholders: “Coming in next phase”.
-
----
-
-## J) Regression requirements
-
-Must keep working from Phase 1:
-- Quick Play complete match flow
-- Toss → innings → result modal
-- Auto/highlights toggles
-- Skip innings/match
-- LocalStorage keys:
-  - `bidxi_skin`
-  - `bidxi_names`
-  - `bidxi_team`
-- `pn()` mapping support unchanged
-- legal disclaimer footer on screens
-
----
-
-## K) Extend self-test (`runSelfTest()`)
-
-Add checks:
-1. Auction mode config exists for mini/mega
-2. `PALL` has 25 valid players with required keys
-3. No player can be sold twice
-4. Team purse never below zero
-5. RTM cannot go negative
-6. Countdown ring function exists and updates stroke/progress
-7. All auction onclick handlers resolve to functions
-
-Log PASS/FAIL summary clearly.
-
----
-
-## Output format
-- Return only the full updated HTML file
-- No markdown fences
-- No explanation text
-
-## Final pre-output validation
-Mentally verify:
-- JS parses cleanly with `new Function(allJS)`
-- one script block only
-- no duplicate declarations
-- Mini and Mega auctions are playable end-to-end
-- Phase 1 gameplay still works without regressions
-Great choice. Here’s a **Phase-split master prompt set** you can paste to Codex/Claude Code one phase at a time.
-
----
-
-## Phase 1 Prompt (Core playable match + UI foundation)
-
-Build a **single-file offline HTML/CSS/JS** mobile game called **BidXI** (IPL-style simulator), portrait-first, Chrome mobile compatible.
-
-### Hard constraints
-- Exactly **one `<script>` block**
-- All globals declared **once at top** before any function
-- No duplicate `let/const`
-- No external libs (only Google Fonts Orbitron + Rajdhani)
-- All `onclick` handlers must map to real functions
-- Must run offline
-
-### Deliver in this phase
-1. **Home screen**
-   - Buttons: Quick Play, IPL Season (locked badge), Mini Auction (locked), Mega Auction (locked)
-   - Team picker for Quick Play only (10 teams)
-2. **Squad selection screen (CC-inspired simplified)**
-   - Scrollable table with columns: #, Player, Role, Form, Fitness, Bat, Bowl
-   - Tap row to select
-   - Show selected count `x/11`
-   - Enforce max 11, min 11 to continue
-   - Enforce max 4 overseas in XI
-3. **Toss + innings setup**
-   - Toss winner and decision
-4. **Match screen base layout**
-   - Top scoreboard bar
-   - Left: pitch canvas + commentary grid + commentary line
-   - Right: batting/bowling info panels
-   - Bottom 8 control buttons (UI only okay for some in Phase 1, but all render)
-5. **Core ball engine (required)**
-   - Use the probability formulas provided in original spec
-   - Simulate legal ball outcomes + wides/no-balls
-   - Track score, wickets, overs, striker/non-striker swap, over completion
-   - 2 innings, target chase, winner
-6. **Controls**
-   - Next Ball
-   - Play Over
-   - Auto toggle on/off
-   - Highlights toggle (skip dot/1/2 faster)
-   - Skip Innings
-7. **Basic result modal**
-   - Winner + margin
-   - Player of match heuristic
-8. **Data**
-   - Include all 10 IPL teams and squads (can use simplified stat values in Phase 1 but structure must match final schema)
-9. **Legal footer**
-   - “⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.”
-
-### Non-goals for Phase 1
-- No auction logic yet
-- No season fixtures/table yet
-- No field placement modal yet
-- No Orange/Purple cap yet
-- No import JSON yet
-
-### Required output format
-- Output only one complete HTML file
-- No explanation text before/after code
-
-### Phase 1 acceptance checklist
-- [ ] One script block only
-- [ ] No duplicate globals
-- [ ] Match can be fully completed from toss to result
-- [ ] Overseas rule enforced on XI selection
-- [ ] Works offline after first load
-
----
-
-## Phase 2 Prompt (Auction systems + retention + pools)
-
-Take the existing Phase 1 file and **extend it** (do not rewrite architecture).
-
-### Hard constraints
-- Keep one script block
-- Preserve all working Phase 1 behavior
-- No duplicate declarations
-
-### Deliver in this phase
-1. **Mini Auction mode**
-   - 4 teams, ₹30 Cr each
-   - Retention flow: retain any number, each retained = 1 RTM
-   - 25 coded fictional auction players
-   - Set order support (Marquee, Bat P1, All-R P1, etc.)
-2. **Mega Auction mode**
-   - 8 teams, ₹90 Cr each
-   - Retention cap logic: 3 kept=3 RTM, 4 kept=2 RTM, 5+=0 RTM
-3. **Auction UI**
-   - Current player card with role, ratings, base price
-   - Team purse bars
-   - Bid log
-   - SOLD/UNSOLD/SKIP badges
-   - Skip Player + Skip Set buttons
-4. **Bid engine**
-   - AI bidding based on role need + purse + squad size
-   - 5-second countdown ring (SVG) color transitions green→gold→red
-   - Accelerated auction behavior once squads near completion
-5. **RTM popup**
-   - Match / Pass
-   - Apply retention constraints
-6. **Auction completion**
-   - Build final squads and allow transition to toss/match
-
-### Non-goals for Phase 2
-- Season fixtures and playoffs can remain locked
-- Orange/Purple cap can remain placeholder
-
-### Phase 2 acceptance checklist
-- [ ] Mini and Mega auction both playable end-to-end
-- [ ] Purse never goes negative
-- [ ] RTM rules enforced per mode
-- [ ] Countdown + bid log visible and functional
-- [ ] No Phase 1 regressions
-
----
-
-## Phase 3 Prompt (Season mode + leaderboards + advanced systems + monetizable cosmetics shell)
-
-Extend the Phase 2 file.
-
-### Deliver in this phase
-1. **IPL Season mode**
-   - 10 teams, 74 matches
-   - Double round-robin league fixtures
-   - Points table: P/W/L/NRR/Pts
-   - Top 4 playoffs: Q1, Eliminator, Q2, Final
-2. **AI vs AI simulation**
-   - Use hardcoded H2H + team strength + variance
-   - Auto-update fixtures/results/table
-3. **Orange Cap + Purple Cap**
-   - Track all teams/all matches continuously
-4. **Field placement modal**
-   - SVG field with legal positions
-   - Move fielders by tap-select and tap-destination
-   - Keeper fixed
-   - Powerplay max 2 outside ring
-5. **Impact player**
-   - Enable after first wicket
-   - Select from non-playing squad
-6. **Import real names JSON**
-   - `{ code: realName }` mapping
-   - `pn()` helper integration throughout
-7. **Statistics screen**
-   - Career records + match history
-8. **Polish**
-   - Toasts
-   - Powerplay badge
-   - Stamina bar behavior
-   - Commentary animations for 4/6/W
-
-### Cosmetics / monetization-ready shell (your requested part)
-Add a **non-intrusive framework only** (no payment integration):
-- `skins` data model for player avatar themes:
-  - default
-  - cricket-warrior
-  - futuristic-pro
-- unlock state in localStorage
-- “Cosmetics” screen with:
-  - Preview selected skin style on stick-figure/player card
-  - Locked/unlocked states
-  - “Battle Pass Coming Soon” placeholder button
-  - “In-app purchases not enabled in this demo” disclaimer
-- Ensure gameplay remains fully functional without cosmetics
-
-### Guardrails
-- No real-money or payment SDK code
-- No dark patterns
-- Cosmetics purely visual
-
-### Phase 3 acceptance checklist
-- [ ] Full season playable to champion
-- [ ] Caps + stats update correctly
-- [ ] Field modal enforces rules
-- [ ] Cosmetics system persists selection in localStorage
-- [ ] Demo disclaimer shown for monetization placeholders
-
----
-
-If you want, I can also give you a **Phase 0 “refactor-safe scaffold prompt”** that forces Codex to first generate a clean architecture skeleton before Phase 1 (this reduces giant-file breakage a lot).
-  
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>BidXI — IPL 2026 Cricket Simulator (Part 1)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#060010; --panel:#0E0020; --panel2:#160030; --navy:#0A1628; --navyb:#0E2040;
+      --red:#E53935; --red2:#FF5252; --gold:#FFD700; --gold2:#FFA500; --green:#00C853;
+      --blue:#00B0FF; --orange:#FF6D00; --purple:#CE93D8; --border:#250040; --text:#F0E0FF; --muted:#7060A0;
+      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;height:100%;background:
+      radial-gradient(80vw 40vh at 50% -10%, #3b0a66 0%, transparent 60%),
+      radial-gradient(70vw 40vh at 100% 100%, #2a0c4f 0%, transparent 60%),
+      var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;overflow:hidden}
+    body{display:flex;flex-direction:column}
+    .top{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:linear-gradient(180deg,var(--panel2),var(--panel));border-bottom:1px solid var(--border)}
+    .brand{font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:.8px}
+    .muted{color:var(--muted)}
+    .badge{padding:3px 8px;border-radius:999px;background:var(--navyb);border:1px solid #294676;font-size:12px}
+    #app{flex:1;position:relative;overflow:hidden}
+    .screen{display:none;position:absolute;inset:0;padding:10px;overflow:auto;gap:10px;flex-direction:column}
+    .screen.active{display:flex}
+    .card{background:linear-gradient(180deg,#130028,#0a021b);border:1px solid var(--border);border-radius:12px;padding:10px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .btn{min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid #2b3f66;background:linear-gradient(180deg,#1a2c4c,#10213d);color:#e7f1ff;font-weight:700}
+    .btn:disabled{opacity:.45}
+    .btn.gold{background:linear-gradient(180deg,#5a4500,#3b2d00);border-color:#8f6a00;color:#ffe38d}
+    .btn.red{background:linear-gradient(180deg,#4f1313,#350a0a);border-color:#7b1d1d}
+    .btn.green{background:linear-gradient(180deg,#0f3c1d,#0a2d16);border-color:#1c6a35}
+    .btn.ghost{background:transparent}
+    .mode-btn{text-align:left;display:flex;align-items:center;justify-content:space-between}
+    .mode-title{font-size:18px;font-weight:700}
+    .mode-sub{font-size:13px;color:#9db2d5}
+    .small{font-size:12px}
+    .footer-legal{font-size:12px;color:#9b8ec3;text-align:center;padding-bottom:12px}
+    .toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:9999;background:#3b2d00;border:1px solid #8a6a00;color:#ffdf7a;padding:9px 12px;border-radius:10px;display:none;max-width:90vw}
+    .toast.ok{background:#063814;border-color:#0a6a2a;color:#88f4ae}
+    .toast.err{background:#3f0d0d;border-color:#7f1d1d;color:#ff9b9b}
+
+    /* Team/squad */
+    .team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .team-chip{min-height:52px;border-radius:10px;border:1px solid #2b3f66;padding:10px;font-weight:700}
+    .selCount{font-family:'Orbitron';font-size:14px}
+    .tbl-wrap{overflow:auto;border:1px solid var(--border);border-radius:10px}
+    table{border-collapse:collapse;width:max-content;min-width:100%;font-size:13px}
+    th,td{border-bottom:1px solid #1f1430;padding:8px;white-space:nowrap}
+    thead th{position:sticky;top:0;background:var(--navy);z-index:2}
+    tr.sel{background:#0f3a21}
+    .formbar{height:8px;width:52px;border-radius:999px;background:#2a1d3f;overflow:hidden}
+    .formbar > i{display:block;height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e)}
+    .stars{color:#ffd76a}
+    .frow{position:sticky;bottom:0;background:var(--navy);display:flex;gap:6px;padding:8px;border-top:1px solid #22345c}
+    .pill{padding:6px 8px;border-radius:999px;background:#1a2d4f;border:1px solid #2a4578;font-size:12px}
+
+    /* Match layout */
+    .scorebar{background:var(--navy);border:1px solid #20365f;border-radius:10px;padding:8px;display:flex;justify-content:space-between;align-items:center;font-family:'Orbitron'}
+    .pp{background:var(--orange);color:#221100;padding:2px 6px;border-radius:8px;font-weight:700;font-size:11px;margin-left:6px}
+    .mgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:8px}
+    .pitch{width:100%;height:170px;border:1px solid #1d2f55;border-radius:10px;background:#244}
+    .comm-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+    .ball{height:22px;border-radius:6px;background:#2a1d3f;display:flex;align-items:center;justify-content:center;font-weight:700}
+    .b4{background:#0b4f8a}.b6{background:#8a6500;animation:pulse .8s ease}.bw{background:#8a1f1f}.bex{background:#8a4c00}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+    .panel h4{margin:0 0 8px 0}
+    .row{display:flex;gap:6px;align-items:center}
+    .sp{justify-content:space-between}
+    .bar{height:8px;background:#23163a;border-radius:999px;overflow:hidden}
+    .bar > i{display:block;height:100%}
+    .wagon,.pitchmap{width:100%;height:130px;border:1px solid #23365f;border-radius:10px;background:#081225}
+    .botbar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .botbar .btn{font-size:12px;padding:8px}
+
+    /* Modal */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;z-index:9000;padding:12px}
+    .overlay.show{display:flex}
+    .modal{width:min(680px,96vw);max-height:92vh;overflow:auto;background:#f9f9ff;color:#111;border-radius:12px;padding:12px}
+    .modal h3{margin:0 0 8px}
+    .wbox{background:#fff;border:1px solid #ddd;border-radius:10px;padding:8px}
+    .cond-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee}
+    .cond-row:last-child{border-bottom:none}
+    .cbar{height:10px;background:#eee;border-radius:999px;overflow:hidden;width:45%}
+    .cbar i{display:block;height:100%;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e)}
+    .fsvg{width:100%;height:280px;border:1px solid #ddd;border-radius:10px;background:#fefefe}
+    .tiny{font-size:11px}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="brand">🏏 BidXI <span class="muted small">IPL 2026</span></div>
+    <div class="row">
+      <span class="badge" id="hdrMode">HOME</span>
+      <span class="badge selCount" id="selCountHdr">0/11</span>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <div id="app">
+    <!-- HOME -->
+    <section id="screen-home" class="screen active">
+      <div class="card">
+        <h2 style="margin:0 0 8px;font-family:Orbitron">Choose Mode</h2>
+        <div class="grid2">
+          <button class="btn mode-btn" onclick="goMode('quick')"><span><div class="mode-title">Quick Play</div><div class="mode-sub">Pick team → XI → Toss → Play</div></span>▶</button>
+          <button class="btn mode-btn" onclick="goMode('season')"><span><div class="mode-title">IPL 2026 Season</div><div class="mode-sub">74 matches + playoffs + caps</div></span>▶</button>
+          <button class="btn mode-btn" onclick="goMode('mini')"><span><div class="mode-title">Mini Auction</div><div class="mode-sub">4 teams · ₹30Cr</div></span>▶</button>
+          <button class="btn mode-btn" onclick="goMode('mega')"><span><div class="mode-title">Mega Auction</div><div class="mode-sub">8 teams · ₹90Cr</div></span>▶</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px">Import Real Names JSON</h3>
+        <input type="file" id="jsonImport" accept=".json,application/json" onchange="importNames(event)" />
+        <div class="small muted" style="margin-top:6px">Personal use only, not affiliated with IPL/BCCI.</div>
+      </div>
+
+      <div class="footer-legal">⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.</div>
+    </section>
+
+    <!-- TEAM SELECT -->
+    <section id="screen-teamsel" class="screen">
+      <div class="card">
+        <h3 style="margin:0 0 8px">Select Team</h3>
+        <div class="team-grid" id="teamGrid"></div>
+      </div>
+      <div class="footer-legal">⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.</div>
+    </section>
+
+    <!-- SQUAD -->
+    <section id="screen-squad" class="screen">
+      <div class="card">
+        <div class="row sp">
+          <h3 style="margin:0">CC Squad Selection</h3>
+          <span class="badge selCount" id="selCount">0/11</span>
+        </div>
+        <div class="tbl-wrap" id="squadWrap"></div>
+        <div class="frow">
+          <span class="pill">Form ▼▲</span><span class="pill">T20 ▼▲</span><span class="pill">Career ▼▲</span><span class="pill">All Roles ▼▲</span>
+          <button class="btn ghost" onclick="openConditions()">☁ Conditions</button>
+        </div>
+        <div class="row sp" style="margin-top:8px">
+          <button class="btn" onclick="backToTeams()">← Back</button>
+          <button class="btn" onclick="openConditions()">☁ Conditions</button>
+          <button class="btn gold" id="playBtn" onclick="toToss()" disabled>▶▶ Play Match</button>
+        </div>
+      </div>
+      <div class="footer-legal">⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.</div>
+    </section>
+
+    <!-- TOSS -->
+    <section id="screen-toss" class="screen">
+      <div class="card">
+        <h3 style="margin-top:0">Toss</h3>
+        <p id="tossLine">Call the toss.</p>
+        <div class="row">
+          <button class="btn" onclick="doToss('heads')">Heads</button>
+          <button class="btn" onclick="doToss('tails')">Tails</button>
+        </div>
+        <div id="tossAct" class="row" style="margin-top:8px;display:none">
+          <button class="btn green" onclick="chooseBatBowl('bat')">Bat First</button>
+          <button class="btn" onclick="chooseBatBowl('bowl')">Bowl First</button>
+        </div>
+      </div>
+      <div class="footer-legal">⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.</div>
+    </section>
+
+    <!-- MATCH -->
+    <section id="screen-match" class="screen">
+      <div class="scorebar">
+        <div id="sbLeft">TEAM — INN 1 <span id="ppBadge" class="pp">PP</span></div>
+        <div id="sbMid">0/0</div>
+        <div id="sbRight">(0.0/20) Need 0 off 0</div>
+      </div>
+
+      <div class="mgrid">
+        <div class="card">
+          <canvas id="pitch" class="pitch" width="500" height="170"></canvas>
+          <div class="pill" style="margin:8px 0 6px">COMMENTARY</div>
+          <div id="commGrid" class="comm-grid"></div>
+          <div class="small muted" id="overBar" style="margin-top:6px">Over: -</div>
+          <div id="commText" style="margin-top:6px">Ready.</div>
+        </div>
+
+        <div class="card panel">
+          <h4>Bowler <span class="muted" id="bowName">-</span></h4>
+          <div class="row sp small"><span>O R W Econ</span><button class="btn" onclick="manualChangeBowler()">Change ▾</button></div>
+          <div id="bowStats" class="small">0.0 0 0 0.0</div>
+          <div class="bar"><i id="stamBar" style="width:100%;background:#22c55e"></i></div>
+
+          <hr style="border-color:#1e2f54" />
+          <h4 id="batHead">Batting Controls</h4>
+          <div id="batPanel">
+            <div class="small" id="batA">[RHB] Striker 0(0)</div>
+            <div class="small" id="batB">[LHB] Non-Striker 0(0)</div>
+            <svg id="wagon" class="wagon" viewBox="0 0 300 130" onclick="tapWagon(event)"></svg>
+            <div class="row sp" style="margin-top:6px">
+              <button class="btn" onclick="setAggr(-1)">Defensive</button>
+              <span class="badge" id="aggrLabel">Aggression 5</span>
+              <button class="btn red" onclick="setAggr(1)">Aggressive</button>
+            </div>
+          </div>
+
+          <div id="bowlPanel" style="display:none">
+            <svg id="pitchMap" class="pitchmap" viewBox="0 0 220 130" onclick="tapPitchMap(event)"></svg>
+            <div class="row"><span>LINE:</span><button class="btn" onclick="setLine('IN')">IN</button><button class="btn" onclick="setLine('MID')">MID</button><button class="btn" onclick="setLine('OUT')">OUT</button></div>
+            <div class="row"><span>LENGTH:</span><button class="btn" onclick="setLen('Full')">Full</button><button class="btn" onclick="setLen('Good')">Good</button><button class="btn" onclick="setLen('Short')">Short</button></div>
+            <div class="row"><span>SWING:</span><button class="btn" onclick="setSwing('In')">In</button><button class="btn" onclick="setSwing('None')">None</button><button class="btn" onclick="setSwing('Out')">Out</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card botbar">
+        <button class="btn" onclick="openMenu()">☰ Menu</button>
+        <button class="btn" onclick="openField()">👁 Field</button>
+        <button class="btn" onclick="toggleHL()">🎬 Highlights</button>
+        <button class="btn" onclick="toggleAuto()">🤖 Auto</button>
+        <button class="btn" onclick="nextBallNow()">⏭ Next Ball</button>
+        <button class="btn" onclick="playOverNow()">⏩ Play Over</button>
+        <button class="btn" onclick="skipInn()">⏩⏩ Skip Inn</button>
+        <button class="btn red" onclick="skipMatch()">🏁 Skip Match</button>
+      </div>
+      <div class="footer-legal">⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.</div>
+    </section>
+  </div>
+
+  <!-- Conditions Modal -->
+  <div id="condOverlay" class="overlay">
+    <div class="modal">
+      <h3>Playing Conditions</h3>
+      <div class="wbox">
+        <div class="cond-row"><span>Day 1 Morning</span><span>☀️</span></div>
+        <div class="cond-row"><span>Day 1 Afternoon</span><span>⛅</span></div>
+        <div class="cond-row"><span>Day 1 Evening</span><span>🌧️</span></div>
+        <div class="cond-row"><span>Light</span><div class="cbar"><i style="width:78%"></i></div><span>Good</span></div>
+        <div class="cond-row"><span>Bounce</span><div class="cbar"><i style="width:68%"></i></div><span>Average</span></div>
+        <div class="cond-row"><span>Wear</span><div class="cbar"><i style="width:44%"></i></div><span>Poor</span></div>
+        <div class="cond-row"><span>Outfield</span><div class="cbar"><i style="width:86%"></i></div><span>Very Good</span></div>
+      </div>
+      <div style="margin-top:8px;text-align:right"><button class="btn" onclick="closeConditions()">OK</button></div>
+    </div>
+  </div>
+
+  <!-- Field Modal -->
+  <div id="fieldOverlay" class="overlay">
+    <div class="modal">
+      <h3>Field Placement</h3>
+      <svg id="fieldSvg" class="fsvg" viewBox="0 0 400 260" onclick="fieldTap(event)"></svg>
+      <div class="tiny muted">Tap occupied fielder, then tap destination. WK is fixed. Powerplay: max 2 outside circle.</div>
+      <div class="row sp" style="margin-top:8px">
+        <button class="btn" onclick="closeField()">Cancel</button>
+        <button class="btn green" onclick="confirmField()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+/* =========================
+   1) CONSTANTS
+========================= */
+const RC = {OVERS:20, BALLS:120, MAX_OS:4};
+const CIRC = Math.PI*2;
+const SET_ORD = ["Marquee","Bat1","AR1","Fast1","Spin1","Bat2","AR2","Fast2","Spin2"];
+const SET_LBL = {"Marquee":"Marquee","Bat1":"Bat Pool 1","AR1":"All-Rounder Pool 1","Fast1":"Fast Bowl Pool 1","Spin1":"Spin Pool 1","Bat2":"Bat Pool 2","AR2":"All-R Pool 2","Fast2":"Fast Pool 2","Spin2":"Spin Pool 2"};
+
+/* =========================
+   2) ALL GLOBALS (single declarations)
+========================= */
+let gameMode="home", G={}, M={}, GA={}, GRetained={}, dragFrom=null, activeFielders=[], batControls={}, bowlControls={};
+let nameMap={}, autoPlay=true, highLights=true, autoTimer=null, skipFast=false, currentScreen="screen-home";
+let myTeam="", oppTeam="", myXI=[], oppXI=[], tossWinner="", tossCall="", tossChoice="", innings=1;
+let striker=0, nonStriker=1, nextBatIdx=2, score1=0, wk1=0, balls1=0, score2=0, wk2=0, balls2=0, target=0;
+let commBalls=[], overRuns=0, prevBowlerIdx=-1, currentBowlerIdx=0, bowlerOvers={}, bowlerRuns={}, bowlerWkts={}, bowlerStam={};
+let aggr=5, defensive=0, wagonZone="Mid", lineSel="MID", lenSel="Good", swingSel="None", impactUsed=false;
+let seasonData={fixtures:[], table:{}, caps:{orange:{},purple:{}}, history:[], played:0, total:74};
+let auctionState={teams:[], purse:{}, squad:{}, rtm:{}, pool:[], idx:0, sold:{}, unsold:{}, skip:{}, current:null, mode:"mini"};
+let FIELD_POS=[], H2H={};
+let IPL2026={}, IPL_META=[], PALL=[];
+
+/* =========================
+   3) IPL2026 DATA (Part 1 subset; Part 2 full)
+========================= */
+IPL2026 = {
+  CSK:[
+    {name:"Ruturaj Gaikwad",role:"bat",emoji:"🏏",hand:"RHB",bat:90,bowl:12,bat_avg:37.2,bat_sr:138,bowl_avg:0,bowl_econ:0,wkts:null,inns:132,overs:0,form:4,fitness:90,cap:true,os:false},
+    {name:"MS Dhoni",role:"wk",emoji:"🧤",hand:"RHB",bat:78,bowl:1,bat_avg:38.2,bat_sr:132,bowl_avg:0,bowl_econ:0,wkts:null,inns:264,overs:0,form:3,fitness:78,cap:true,os:false},
+    {name:"Shivam Dube",role:"all",emoji:"🌀",hand:"LHB",bat:82,bowl:34,bat_avg:28.1,bat_sr:146,bowl_avg:33.5,bowl_econ:8.7,wkts:32,inns:98,overs:101,form:4,fitness:86,cap:true,os:false},
+    {name:"Rahul Chahar",role:"spin",emoji:"🧿",hand:"RHB",bat:28,bowl:81,bat_avg:9.2,bat_sr:108,bowl_avg:24.8,bowl_econ:7.4,wkts:106,inns:36,overs:331,form:3,fitness:88,cap:true,os:false},
+    {name:"Khaleel Ahmed",role:"bowl",emoji:"🎯",hand:"LHB",bat:21,bowl:80,bat_avg:8.1,bat_sr:95,bowl_avg:27.3,bowl_econ:8.3,wkts:89,inns:28,overs:286,form:3,fitness:87,cap:true,os:false},
+    {name:"Noor Ahmad*",role:"spin",emoji:"🧿",hand:"LHB",bat:33,bowl:84,bat_avg:12.4,bat_sr:114,bowl_avg:21.5,bowl_econ:7.1,wkts:78,inns:31,overs:240,form:4,fitness:90,cap:true,os:true},
+    {name:"Matt Henry*",role:"bowl",emoji:"🎯",hand:"RHB",bat:26,bowl:82,bat_avg:11.7,bat_sr:103,bowl_avg:23.8,bowl_econ:7.5,wkts:122,inns:48,overs:377,form:4,fitness:89,cap:true,os:true},
+    {name:"Jamie Overton*",role:"all",emoji:"🌀",hand:"RHB",bat:68,bowl:74,bat_avg:24.6,bat_sr:148,bowl_avg:27.6,bowl_econ:8.4,wkts:71,inns:78,overs:234,form:3,fitness:85,cap:true,os:true},
+    {name:"Dewald Brevis*",role:"bat",emoji:"🏏",hand:"RHB",bat:84,bowl:22,bat_avg:29.4,bat_sr:157,bowl_avg:0,bowl_econ:0,wkts:null,inns:69,overs:6,form:4,fitness:88,cap:true,os:true},
+    {name:"Sanju Samson",role:"wk",emoji:"🧤",hand:"RHB",bat:88,bowl:1,bat_avg:31.8,bat_sr:139,bowl_avg:0,bowl_econ:0,wkts:null,inns:174,overs:0,form:4,fitness:90,cap:true,os:false},
+    {name:"Mukesh Choudhary",role:"bowl",emoji:"🎯",hand:"LHB",bat:17,bowl:72,bat_avg:7.9,bat_sr:89,bowl_avg:29.1,bowl_econ:8.7,wkts:47,inns:20,overs:150,form:2,fitness:83,cap:false,os:false}
+  ],
+  MI:[
+    {name:"Hardik Pandya",role:"all",emoji:"🌀",hand:"RHB",bat:87,bowl:79,bat_avg:30.1,bat_sr:146,bowl_avg:27.8,bowl_econ:8.2,wkts:97,inns:151,overs:312,form:4,fitness:87,cap:true,os:false},
+    {name:"Rohit Sharma",role:"bat",emoji:"🏏",hand:"RHB",bat:90,bowl:6,bat_avg:31.2,bat_sr:133,bowl_avg:0,bowl_econ:0,wkts:null,inns:248,overs:0,form:3,fitness:84,cap:true,os:false},
+    {name:"Suryakumar Yadav",role:"bat",emoji:"🏏",hand:"RHB",bat:95,bowl:5,bat_avg:34.8,bat_sr:171,bowl_avg:0,bowl_econ:0,wkts:null,inns:156,overs:0,form:5,fitness:91,cap:true,os:false},
+    {name:"Jasprit Bumrah",role:"bowl",emoji:"🎯",hand:"RHB",bat:22,bowl:96,bat_avg:9.6,bat_sr:98,bowl_avg:17.2,bowl_econ:6.8,wkts:155,inns:54,overs:388,form:5,fitness:92,cap:true,os:false},
+    {name:"Tilak Varma",role:"bat",emoji:"🏏",hand:"LHB",bat:86,bowl:12,bat_avg:33.1,bat_sr:141,bowl_avg:0,bowl_econ:0,wkts:null,inns:87,overs:0,form:4,fitness:90,cap:true,os:false},
+    {name:"Deepak Chahar",role:"bowl",emoji:"🎯",hand:"RHB",bat:29,bowl:82,bat_avg:14.2,bat_sr:122,bowl_avg:24.2,bowl_econ:7.7,wkts:118,inns:66,overs:356,form:3,fitness:80,cap:true,os:false},
+    {name:"Will Jacks*",role:"all",emoji:"🌀",hand:"RHB",bat:84,bowl:57,bat_avg:31.5,bat_sr:157,bowl_avg:31.6,bowl_econ:8.8,wkts:41,inns:94,overs:122,form:4,fitness:88,cap:true,os:true},
+    {name:"Trent Boult*",role:"bowl",emoji:"🎯",hand:"LHB",bat:19,bowl:87,bat_avg:7.1,bat_sr:88,bowl_avg:22.4,bowl_econ:7.4,wkts:187,inns:72,overs:543,form:4,fitness:86,cap:true,os:true},
+    {name:"Ryan Rickelton*",role:"wk",emoji:"🧤",hand:"LHB",bat:79,bowl:1,bat_avg:32.2,bat_sr:140,bowl_avg:0,bowl_econ:0,wkts:null,inns:98,overs:0,form:3,fitness:87,cap:true,os:true},
+    {name:"Quinton de Kock*",role:"wk",emoji:"🧤",hand:"LHB",bat:89,bowl:1,bat_avg:33.9,bat_sr:137,bowl_avg:0,bowl_econ:0,wkts:null,inns:240,overs:0,form:4,fitness:85,cap:true,os:true},
+    {name:"Shardul Thakur",role:"all",emoji:"🌀",hand:"RHB",bat:64,bowl:75,bat_avg:16.8,bat_sr:138,bowl_avg:29.4,bowl_econ:8.9,wkts:119,inns:93,overs:330,form:3,fitness:82,cap:true,os:false}
+  ],
+  RCB:[
+    {name:"Rajat Patidar",role:"bat",emoji:"🏏",hand:"RHB",bat:85,bowl:4,bat_avg:31.3,bat_sr:147,bowl_avg:0,bowl_econ:0,wkts:null,inns:84,overs:0,form:4,fitness:89,cap:true,os:false},
+    {name:"Virat Kohli",role:"bat",emoji:"🏏",hand:"RHB",bat:96,bowl:3,bat_avg:36.4,bat_sr:132,bowl_avg:0,bowl_econ:0,wkts:null,inns:252,overs:14,form:5,fitness:91,cap:true,os:false},
+    {name:"Phil Salt*",role:"wk",emoji:"🧤",hand:"RHB",bat:83,bowl:1,bat_avg:28.9,bat_sr:160,bowl_avg:0,bowl_econ:0,wkts:null,inns:96,overs:0,form:4,fitness:89,cap:true,os:true},
+    {name:"Josh Hazlewood*",role:"bowl",emoji:"🎯",hand:"RHB",bat:23,bowl:90,bat_avg:11.3,bat_sr:95,bowl_avg:21.1,bowl_econ:7.0,wkts:131,inns:44,overs:390,form:4,fitness:87,cap:true,os:true},
+    {name:"Bhuvneshwar Kumar",role:"bowl",emoji:"🎯",hand:"RHB",bat:35,bowl:84,bat_avg:14.5,bat_sr:115,bowl_avg:24.9,bowl_econ:7.5,wkts:193,inns:118,overs:612,form:3,fitness:84,cap:true,os:false},
+    {name:"Krunal Pandya",role:"all",emoji:"🌀",hand:"LHB",bat:74,bowl:77,bat_avg:24.3,bat_sr:132,bowl_avg:28.2,bowl_econ:7.3,wkts:95,inns:140,overs:444,form:3,fitness:86,cap:true,os:false},
+    {name:"Venkatesh Iyer",role:"all",emoji:"🌀",hand:"LHB",bat:82,bowl:52,bat_avg:30.4,bat_sr:140,bowl_avg:36.5,bowl_econ:8.8,wkts:24,inns:96,overs:82,form:3,fitness:87,cap:true,os:false},
+    {name:"Tim David*",role:"bat",emoji:"🏏",hand:"RHB",bat:84,bowl:6,bat_avg:27.1,bat_sr:168,bowl_avg:0,bowl_econ:0,wkts:null,inns:112,overs:3,form:4,fitness:90,cap:true,os:true},
+    {name:"Romario Shepherd*",role:"all",emoji:"🌀",hand:"RHB",bat:73,bowl:72,bat_avg:22.8,bat_sr:160,bowl_avg:29.7,bowl_econ:8.9,wkts:63,inns:88,overs:182,form:3,fitness:85,cap:true,os:true},
+    {name:"Devdutt Padikkal",role:"bat",emoji:"🏏",hand:"LHB",bat:79,bowl:3,bat_avg:29.7,bat_sr:127,bowl_avg:0,bowl_econ:0,wkts:null,inns:108,overs:0,form:2,fitness:86,cap:true,os:false},
+    {name:"Jitesh Sharma",role:"wk",emoji:"🧤",hand:"RHB",bat:77,bowl:1,bat_avg:23.8,bat_sr:151,bowl_avg:0,bowl_econ:0,wkts:null,inns:94,overs:0,form:3,fitness:88,cap:true,os:false}
+  ],
+  KKR:[], DC:[], GT:[], LSG:[], PBKS:[], RR:[], SRH:[]
+};
+
+/* =========================
+   4) IPL_META
+========================= */
+IPL_META = [
+  {k:"CSK",n:"Chennai Super Kings",c1:"#F9CD05",c2:"#3A5F8A"},
+  {k:"DC",n:"Delhi Capitals",c1:"#00008B",c2:"#EF1C25"},
+  {k:"GT",n:"Gujarat Titans",c1:"#1C6B57",c2:"#A5ACAF"},
+  {k:"KKR",n:"Kolkata Knight Riders",c1:"#3A225D",c2:"#B3A123"},
+  {k:"LSG",n:"Lucknow Super Giants",c1:"#00B4D8",c2:"#E5B800"},
+  {k:"MI",n:"Mumbai Indians",c1:"#004BA0",c2:"#D1AB3E"},
+  {k:"PBKS",n:"Punjab Kings",c1:"#ABABAB",c2:"#ED1B24"},
+  {k:"RR",n:"Rajasthan Royals",c1:"#254AA5",c2:"#E91E8C"},
+  {k:"RCB",n:"Royal Challengers Bengaluru",c1:"#C8102E",c2:"#000000"},
+  {k:"SRH",n:"Sunrisers Hyderabad",c1:"#F7A721",c2:"#E03A3E"}
+];
+
+/* =========================
+   5) PALL (auction subset, full in Part 2)
+========================= */
+PALL = [
+  {id:1,code:"V. King",role:"BAT",emoji:"🏏",country:"IN",bat:90,bowl:10,avg:39,sr:143,wkts:0,baseL:200,set:"Marquee"},
+  {id:2,code:"R. Storm",role:"FAST",emoji:"🎯",country:"AUS",bat:21,bowl:91,avg:10,sr:98,wkts:168,baseL:200,set:"Marquee"},
+  {id:3,code:"A. Pulse",role:"WK",emoji:"🧤",country:"SA",bat:83,bowl:1,avg:33,sr:148,wkts:0,baseL:150,set:"Bat1"},
+  {id:4,code:"M. Quake",role:"ALL-R",emoji:"🌀",country:"WI",bat:79,bowl:78,avg:29,sr:155,wkts:88,baseL:150,set:"AR1"},
+  {id:5,code:"K. Spinx",role:"SPIN",emoji:"🧿",country:"AFG",bat:42,bowl:92,avg:14,sr:120,wkts:210,baseL:150,set:"Spin1"}
+];
+
+/* =========================
+   6) FIELD_POS
+========================= */
+FIELD_POS = [
+  {n:"WK",x:50,y:56,fixed:true},{n:"1st Slip",x:58,y:59},{n:"Gully",x:62,y:62},{n:"Point",x:70,y:58},
+  {n:"Cover",x:72,y:48},{n:"Extra Cover",x:66,y:44},{n:"Mid Off",x:58,y:39},{n:"Mid On",x:42,y:39},
+  {n:"Mid Wicket",x:31,y:47},{n:"Square Leg",x:28,y:56},{n:"Fine Leg",x:34,y:68},{n:"Long On",x:28,y:30},
+  {n:"Long Off",x:72,y:30},{n:"Deep Mid Wicket",x:18,y:42},{n:"3rd Man",x:78,y:70},{n:"Cow Corner",x:20,y:33},
+  {n:"Deep Cover",x:82,y:40},{n:"Sweeper Cover",x:84,y:52},{n:"Leg Gully",x:38,y:63},{n:"Short Mid On",x:44,y:46}
+];
+
+/* =========================
+   7) H2H (subset; full 45 in Part 2)
+========================= */
+H2H = {
+  "CSK|MI":{avg1st:168,avg2nd:162,team1WinPct:52},
+  "CSK|RCB":{avg1st:172,avg2nd:165,team1WinPct:58},
+  "MI|RCB":{avg1st:173,avg2nd:166,team1WinPct:55},
+  "KKR|CSK":{avg1st:167,avg2nd:159,team1WinPct:40},
+  "SRH|RCB":{avg1st:176,avg2nd:169,team1WinPct:51},
+  "GT|CSK":{avg1st:172,avg2nd:165,team1WinPct:46}
+};
+
+/* =========================
+   8) UTIL
+========================= */
+function ss(id){const all=document.querySelectorAll(".screen");for(let i=0;i<all.length;i++)all[i].classList.remove("active");const el=document.getElementById("screen-"+id);if(el){el.classList.add("active");currentScreen="screen-"+id;}}
+function rnd(a,b){return Math.random()*(b-a)+a;}
+function rndi(a,b){return Math.floor(rnd(a,b+1));}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function fmtOv(b){return Math.floor(b/6)+"."+(b%6);}
+function teamMeta(k){for(let i=0;i<IPL_META.length;i++) if(IPL_META[i].k===k) return IPL_META[i]; return IPL_META[0];}
+function pn(p){const n=p && p.name ? p.name : (p && p.code ? p.code : "");return nameMap[n]||n;}
+function toast(msg,kind){const t=document.getElementById("toast");t.className="toast"+(kind==="ok"?" ok":kind==="err"?" err":"");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none";},2400);}
+function stopAll(){if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}}
+function resetMatchState(){
+  innings=1;score1=0;wk1=0;balls1=0;score2=0;wk2=0;balls2=0;target=0;commBalls=[];overRuns=0;
+  striker=0;nonStriker=1;nextBatIdx=2;prevBowlerIdx=-1;currentBowlerIdx=0;impactUsed=false;
+  bowlerOvers={};bowlerRuns={};bowlerWkts={};bowlerStam={};aggr=5;defensive=0;lineSel="MID";lenSel="Good";swingSel="None";
+}
+function oversToNum(b){return Math.floor(b/6)+((b%6)/10);}
+function ensureOppXI(){if(!oppXI || oppXI.length<11){const s=IPL2026[oppTeam]||[];oppXI=s.slice(0,11);}}
+
+/* =========================
+   9) HOME / MODE
+========================= */
+function goMode(m){
+  gameMode=m;document.getElementById("hdrMode").textContent=m.toUpperCase();
+  if(m==="quick"||m==="season"){buildTeamGrid();ss("teamsel");}
+  else {toast("Auction module base is loaded in Part 1. Full flow in Part 2.","ok");}
+}
+function buildTeamGrid(){
+  const g=document.getElementById("teamGrid");g.innerHTML="";
+  for(let i=0;i<IPL_META.length;i++){
+    const t=IPL_META[i];const b=document.createElement("button");
+    b.className="team-chip";b.style.background="linear-gradient(135deg,"+t.c1+"33,"+t.c2+"33)";b.style.borderColor=t.c2;
+    b.textContent=t.k+" — "+t.n;b.onclick=(function(k){return function(){chooseTeam(k);};})(t.k);g.appendChild(b);
+  }
+}
+function chooseTeam(k){
+  myTeam=k;myXI=[];oppTeam=pickOpp(k);toast("Selected "+k);buildSquadTable();ss("squad");
+}
+function pickOpp(k){
+  const keys=IPL_META.map(function(x){return x.k;}).filter(function(x){return x!==k;});
+  return keys[rndi(0,keys.length-1)];
+}
+function backToTeams(){ss("teamsel");}
+function importNames(e){
+  const f=e.target.files && e.target.files[0];if(!f) return;
+  const rd=new FileReader();rd.onload=function(){try{nameMap=JSON.parse(rd.result);toast("Name map imported","ok");}catch(err){toast("Invalid JSON","err");}};rd.readAsText(f);
+}
+
+/* =========================
+   10) SQUAD SCREEN
+========================= */
+function buildSquadTable(){
+  const squad=IPL2026[myTeam]||[];
+  let html='<table><thead><tr><th>#</th><th>Player</th><th>Form+Fit</th><th>Inns</th><th>Bat avg</th><th>SR%</th><th>Type</th><th>Overs</th><th>W</th><th>Bowl avg</th><th>Econ</th></tr></thead><tbody>';
+  for(let i=0;i<squad.length;i++){
+    const p=squad[i], typ=(p.role==="wk"?"WK":(p.role==="spin"?"OS":"RMF"));
+    html+='<tr id="prow'+i+'" onclick="toggleSel('+i+')"><td>'+(i+1)+'</td><td>'+p.emoji+' '+pn(p)+(p.os?' *':'')+'</td><td><div class="formbar"><i style="width:'+(p.form*20)+'%"></i></div> <span class="stars">'+"★".repeat(Math.max(1,Math.round(p.fitness/20)))+'</span></td><td>'+p.inns+'</td><td>'+p.bat_avg+'</td><td>'+p.bat_sr+'</td><td>'+typ+'</td><td>'+p.overs+'</td><td>'+(p.wkts===null?'-':p.wkts)+'</td><td>'+(p.bowl_avg||'-')+'</td><td>'+(p.bowl_econ||'-')+'</td></tr>';
+  }
+  html+='</tbody></table>';document.getElementById("squadWrap").innerHTML=html;updateSelCount();
+}
+function toggleSel(i){
+  const p=(IPL2026[myTeam]||[])[i];if(!p) return;
+  const idx=myXI.indexOf(i);
+  if(idx>=0) myXI.splice(idx,1); else if(myXI.length<11) myXI.push(i); else toast("Only 11 players allowed","err");
+  updateSelCount();
+}
+function updateSelCount(){
+  const squad=IPL2026[myTeam]||[];let os=0;
+  for(let i=0;i<squad.length;i++){const r=document.getElementById("prow"+i);if(r) r.classList.toggle("sel",myXI.indexOf(i)>=0);}
+  for(let i=0;i<myXI.length;i++){const p=squad[myXI[i]];if(p&&p.os)os++;}
+  document.getElementById("selCount").textContent=myXI.length+"/11";document.getElementById("selCountHdr").textContent=myXI.length+"/11";
+  document.getElementById("playBtn").disabled=myXI.length!==11;
+  if(os>RC.MAX_OS) toast("Overseas limit exceeded (>4)","err");
+}
+
+/* =========================
+   11) RETENTION (stub for Part 2)
+========================= */
+function retentionInit(){}
+
+/* =========================
+   12) AUCTION ENGINE (stub for Part 2)
+========================= */
+function auctionInit(){}
+
+/* =========================
+   13) TOSS
+========================= */
+function toToss(){
+  const squad=IPL2026[myTeam]||[];let os=0;for(let i=0;i<myXI.length;i++){if(squad[myXI[i]]&&squad[myXI[i]].os)os++;}
+  if(myXI.length!==11){toast("Select 11 players","err");return;}
+  if(os>4){toast("Max 4 overseas in XI","err");return;}
+  document.getElementById("tossLine").textContent="Call the toss.";document.getElementById("tossAct").style.display="none";ss("toss");
+}
+function doToss(call){
+  tossCall=call;const coin=Math.random()<0.5?"heads":"tails";const meWin=(call===coin);tossWinner=meWin?myTeam:oppTeam;
+  document.getElementById("tossLine").textContent="It is "+coin.toUpperCase()+". "+tossWinner+" won the toss.";
+  if(meWin) document.getElementById("tossAct").style.display="flex"; else {tossChoice=Math.random()<0.5?"bat":"bowl";setTimeout(startMatchFromToss,500);}
+}
+function chooseBatBowl(c){tossChoice=c;startMatchFromToss();}
+function startMatchFromToss(){
+  const meBatFirst=(tossWinner===myTeam? tossChoice==="bat" : tossChoice!=="bat");
+  M={meBatFirst:meBatFirst};startMatch();
+}
+
+/* =========================
+   14) MATCH INIT
+========================= */
+function startMatch(){
+  resetMatchState();ensureOppXI();
+  const ms=IPL2026[myTeam]||[];const osel=myXI.map(function(i){return ms[i];});
+  G.myBat = M.meBatFirst ? osel : (oppXI.slice(0,11));
+  G.myBowl = M.meBatFirst ? (oppXI.slice(0,11)) : osel;
+  G.aiBat = M.meBatFirst ? (oppXI.slice(0,11)) : osel;
+  G.aiBowl = M.meBatFirst ? osel : (oppXI.slice(0,11));
+  if(!G.myBat || G.myBat.length<11){G.myBat=(ms.slice(0,11));}
+  if(!G.myBowl || G.myBowl.length<11){G.myBowl=(oppXI.slice(0,11));}
+  if(!G.aiBat || G.aiBat.length<11){G.aiBat=(oppXI.slice(0,11));}
+  if(!G.aiBowl || G.aiBowl.length<11){G.aiBowl=(ms.slice(0,11));}
+  for(let i=0;i<11;i++){bowlerOvers[i]=0;bowlerRuns[i]=0;bowlerWkts[i]=0;bowlerStam[i]=100;}
+  drawPitch();renderWagon();renderPitchMap();updatePanels();updateScorebar();renderComm();ss("match");
+  if(autoPlay) autoLoop();
+}
+
+/* =========================
+   15) PITCH DRAW
+========================= */
+function drawPitch(){
+  const c=document.getElementById("pitch");if(!c)return;const x=c.getContext("2d");
+  x.clearRect(0,0,c.width,c.height);
+  const sky=x.createLinearGradient(0,0,0,100);sky.addColorStop(0,"#5BA8D4");sky.addColorStop(1,"#8DC8E8");x.fillStyle=sky;x.fillRect(0,0,c.width,80);
+  x.fillStyle="#4a1f2f";for(let i=0;i<26;i++){x.fillRect(i*20,70+Math.sin(i)*3,16,10);}
+  const grd=x.createLinearGradient(0,80,0,170);grd.addColorStop(0,"#4A8040");grd.addColorStop(1,"#3A6030");x.fillStyle=grd;x.fillRect(0,80,c.width,90);
+  x.fillStyle="#C8A870";x.beginPath();x.moveTo(210,150);x.lineTo(290,150);x.lineTo(260,90);x.lineTo(240,90);x.closePath();x.fill();
+  stick(x,250,128,"#D4AF37",true); stick(x,235,145,"#D4AF37",false); stickBowler(x,250,84,"#E53935"); stickWK(x,250,156,"#00B0FF");
+  const fld=[[180,118],[320,118],[165,138],[335,138],[250,60]];for(let i=0;i<fld.length;i++)stickSimple(x,fld[i][0],fld[i][1],"#ffffff");
+}
+function stick(ctx,x,y,col,bat){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-20,5,0,CIRC);ctx.fill();ctx.beginPath();ctx.moveTo(x,y-15);ctx.lineTo(x,y);ctx.moveTo(x-8,y-10);ctx.lineTo(x+8,y-8);ctx.moveTo(x,y);ctx.lineTo(x-6,y+12);ctx.moveTo(x,y);ctx.lineTo(x+6,y+12);ctx.stroke();if(bat){ctx.fillRect(x+8,y-12,3,16);}}
+function stickBowler(ctx,x,y,col){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-20,5,0,CIRC);ctx.fill();ctx.beginPath();ctx.moveTo(x,y-15);ctx.lineTo(x,y);ctx.moveTo(x,y-12);ctx.lineTo(x+12,y-20);ctx.moveTo(x,y);ctx.lineTo(x-6,y+12);ctx.moveTo(x,y);ctx.lineTo(x+6,y+12);ctx.stroke();ctx.beginPath();ctx.arc(x+14,y-22,2,0,CIRC);ctx.fill();}
+function stickWK(ctx,x,y,col){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-16,5,0,CIRC);ctx.fill();ctx.beginPath();ctx.moveTo(x,y-11);ctx.lineTo(x,y-2);ctx.moveTo(x,y-8);ctx.lineTo(x-10,y-2);ctx.moveTo(x,y-8);ctx.lineTo(x+10,y-2);ctx.moveTo(x,y-2);ctx.lineTo(x-8,y+8);ctx.moveTo(x,y-2);ctx.lineTo(x+8,y+8);ctx.stroke();}
+function stickSimple(ctx,x,y,col){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-7,3,0,CIRC);ctx.fill();ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x,y+5);ctx.stroke();}
+
+/* =========================
+   16) BATTING PANEL
+========================= */
+function renderWagon(){
+  const s=document.getElementById("wagon");if(!s)return;
+  const z=["Leg","Mid","Off","On","Cover"];let txt='<rect x="0" y="0" width="300" height="130" fill="#0a1529"/><circle cx="70" cy="65" r="42" fill="'+(wagonZone==="Leg"?"#5a3b00":"#12213b")+'"/><circle cx="150" cy="65" r="42" fill="'+(wagonZone==="Mid"?"#5a3b00":"#12213b")+'"/><circle cx="230" cy="65" r="42" fill="'+(wagonZone==="Off"?"#5a3b00":"#12213b")+'"/><rect x="125" y="14" width="50" height="22" fill="'+(wagonZone==="On"?"#5a3b00":"#12213b")+'"/><rect x="125" y="94" width="50" height="22" fill="'+(wagonZone==="Cover"?"#5a3b00":"#12213b")+'"/>';
+  txt+='<text x="58" y="69" fill="#dce8ff">Leg</text><text x="140" y="69" fill="#dce8ff">Mid</text><text x="220" y="69" fill="#dce8ff">Off</text><text x="139" y="29" fill="#dce8ff">On</text><text x="131" y="109" fill="#dce8ff">Cover</text>';
+  s.innerHTML=txt;
+}
+function tapWagon(e){
+  const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  if(x<100) wagonZone="Leg"; else if(x>200) wagonZone="Off"; else wagonZone="Mid";
+  if(y<36) wagonZone="On"; if(y>94) wagonZone="Cover";
+  renderWagon();
+}
+function setAggr(d){aggr=clamp(aggr+d,1,10);document.getElementById("aggrLabel").textContent="Aggression "+aggr;}
+
+/* =========================
+   17) BOWLING PANEL
+========================= */
+function renderPitchMap(){
+  const s=document.getElementById("pitchMap");if(!s)return;
+  s.innerHTML='<rect x="0" y="0" width="220" height="130" fill="#0a1529"/><rect x="90" y="10" width="40" height="110" fill="#1b2d4f"/><line x1="90" y1="45" x2="130" y2="45" stroke="#4e6ea6"/><line x1="90" y1="80" x2="130" y2="80" stroke="#4e6ea6"/><text x="96" y="30" fill="#dce8ff">Short</text><text x="98" y="65" fill="#dce8ff">Good</text><text x="102" y="102" fill="#dce8ff">Full</text><text x="8" y="16" fill="#8fb4f0">Line:'+lineSel+' Len:'+lenSel+' Sw:'+swingSel+'</text>';
+}
+function tapPitchMap(e){
+  const r=e.currentTarget.getBoundingClientRect(),y=e.clientY-r.top;
+  if(y<45) lenSel="Short"; else if(y<80) lenSel="Good"; else lenSel="Full";
+  renderPitchMap();
+}
+function setLine(v){lineSel=v;renderPitchMap();}
+function setLen(v){lenSel=v;renderPitchMap();}
+function setSwing(v){swingSel=v;renderPitchMap();}
+
+/* =========================
+   18) MATCH SIM
+========================= */
+function simBall(){
+  const batTeam=(innings===1?G.myBat:G.aiBat), bowlTeam=(innings===1?G.aiBowl:G.myBowl);
+  if(!batTeam||!bowlTeam) return;
+  const bat=batTeam[striker]||batTeam[0], bowl=bowlTeam[currentBowlerIdx]||bowlTeam[0];
+  let batRating=bat.bat||50, bowlRating=bowl.bowl||50;
+  const b=(innings===1?balls1:balls2), ov=Math.floor(b/6)+1, pp=(ov<=6?1.12:1.0);
+  let effAggr=Math.max(1, aggr-(defensive/10)*3);
+  if(innings===2 && !M.meBatFirst){let wf=1;if(lineSel==="IN")wf*=1.18;else if(lineSel==="OUT")wf*=0.82;if(lenSel==="Good")wf*=1.10;else if(lenSel==="Short")wf*=0.85;else if(lenSel==="Full")wf*=0.95;if(swingSel!=="None")wf*=1.14;bowlRating*=wf;}
+  let wicket=5+(bowlRating-batRating)*0.12+(effAggr-5)*1.2; wicket=clamp(wicket,1,32);
+  let six=(1.5+batRating*0.025*effAggr/5)*pp; six=clamp(six,0.8,26);
+  let four=(6+batRating*0.07*effAggr/5)*pp; four=clamp(four,2,38);
+  const extra=2.8; let rem=Math.max(1,100-(wicket+six+four+extra)); let dot=rem*0.36, one=rem*0.42, two=rem*0.17, three=rem*0.05;
+  const roll=rnd(0,100); let out=".",runs=0,isW=false,isExtra=false;
+  if(roll<extra){isExtra=true; out=(Math.random()<0.5?"Wd":"NB"); runs=1;}
+  else if(roll<extra+wicket){isW=true; out="W";}
+  else if(roll<extra+wicket+six){runs=6;out="6";}
+  else if(roll<extra+wicket+six+four){runs=4;out="4";}
+  else if(roll<extra+wicket+six+four+dot){runs=0;out=".";}
+  else if(roll<extra+wicket+six+four+dot+one){runs=1;out="1";}
+  else if(roll<extra+wicket+six+four+dot+one+two){runs=2;out="2";}
+  else {runs=3;out="3";}
+  applyBall(out,runs,isW,isExtra,bat,bowl);
+}
+function applyBall(out,runs,isW,isExtra,bat,bowl){
+  const isFirst=(innings===1);
+  if(isFirst){score1+=runs; if(!isExtra) balls1++;} else {score2+=runs; if(!isExtra) balls2++;}
+  bowlerRuns[currentBowlerIdx]=(bowlerRuns[currentBowlerIdx]||0)+runs;
+  if(!isExtra){
+    if(isW){
+      if(isFirst)wk1++; else wk2++;
+      bowlerWkts[currentBowlerIdx]=(bowlerWkts[currentBowlerIdx]||0)+1;
+      if(nextBatIdx<11){striker=nextBatIdx;nextBatIdx++;}
+      if(!impactUsed){impactUsed=true;toast("IMPACT player window available","ok");}
+    }else{
+      if(out==="1"||out==="3"){const t=striker;striker=nonStriker;nonStriker=t;}
+      const p=(innings===1?G.myBat:G.aiBat)[striker];if(p){p._r=(p._r||0)+runs;p._b=(p._b||0)+1;}
+    }
+    if(((isFirst?balls1:balls2)%6)===0){const t2=striker;striker=nonStriker;nonStriker=t2;endOver();}
+  }
+  addComm(out);updatePanels();updateScorebar();renderComm();
+  const b=isFirst?balls1:balls2;
+  if((isFirst && (wk1>=10 || b>=120)) || (!isFirst && (wk2>=10 || b>=120 || score2>target))) endInningsOrMatch();
+}
+function endOver(){
+  bowlerOvers[currentBowlerIdx]=(bowlerOvers[currentBowlerIdx]||0)+1;bowlerStam[currentBowlerIdx]=clamp((bowlerStam[currentBowlerIdx]||100)-7,30,100);
+  prevBowlerIdx=currentBowlerIdx;currentBowlerIdx=pickNextBowler();
+  if(innings===2 && !M.meBatFirst && Math.floor(balls2/6)===6){toast("Powerplay ended! Set your field");openField();}
+}
+function pickNextBowler(){
+  const pool=(innings===1?G.aiBowl:G.myBowl);let cand=0,best=999;
+  for(let i=0;i<pool.length;i++){
+    const o=bowlerOvers[i]||0;if(o>=4)continue;if(i===prevBowlerIdx)continue;
+    const v=o*10+(100-(bowlerStam[i]||100));if(v<best){best=v;cand=i;}
+  }return cand;
+}
+function endInningsOrMatch(){
+  if(innings===1){target=score1+1;innings=2;striker=0;nonStriker=1;nextBatIdx=2;prevBowlerIdx=-1;currentBowlerIdx=pickNextBowler();toast("Innings break. Target "+target);if(autoPlay)autoLoop();}
+  else matchEnd();
+}
+function matchEnd(){
+  stopAll();
+  let res="Match Tied";
+  if(score2>=target) res=(M.meBatFirst?"You Lost":"You Won");
+  else res=(M.meBatFirst?"You Won":"You Lost");
+  alert("Result: "+res+"\n1st: "+score1+"/"+wk1+"\n2nd: "+score2+"/"+wk2);
+}
+
+/* =========================
+   19) SKIP
+========================= */
+function skipInn(){for(let i=0;i<5000;i++){if((innings===1&&(wk1>=10||balls1>=120))||(innings===2&&(wk2>=10||balls2>=120||score2>target)))break;simBall();}toast("Innings skipped","ok");}
+function skipMatch(){while(!(innings===2&&(wk2>=10||balls2>=120||score2>target))){simBall();if(innings===1&&(wk1>=10||balls1>=120)){} if((innings===2&&(wk2>=10||balls2>=120||score2>target)))break;}matchEnd();}
+
+/* =========================
+   20) FIELD PLACEMENT
+========================= */
+function openField(){activeFielders=[];for(let i=0;i<11;i++)activeFielders.push(i===0?0:(i+4)%FIELD_POS.length);drawField();document.getElementById("fieldOverlay").classList.add("show");}
+function closeField(){document.getElementById("fieldOverlay").classList.remove("show");dragFrom=null;}
+function drawField(){
+  const s=document.getElementById("fieldSvg");if(!s)return;
+  let html='<rect x="0" y="0" width="400" height="260" fill="#fefefe"/><ellipse cx="200" cy="130" rx="170" ry="105" fill="#d8f2d8" stroke="#8cb38c"/><ellipse cx="200" cy="130" rx="90" ry="55" fill="none" stroke="#999" stroke-dasharray="4 4"/><rect x="190" y="90" width="20" height="80" fill="#e8d2a6" stroke="#b28f56"/>';
+  for(let i=0;i<activeFielders.length;i++){
+    const p=FIELD_POS[activeFielders[i]];if(!p)continue;const cx=4*p.x,cy=2.6*p.y;const sel=(dragFrom===i);
+    html+='<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="'+(p.fixed?"#1d4ed8":(sel?"#f97316":"#16a34a"))+'" stroke="#111"/><text x="'+(cx+11)+'" y="'+(cy+4)+'" font-size="10" fill="#111">'+p.n+'</text>';
+  }
+  s.innerHTML=html;
+}
+function fieldTap(e){
+  const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  if(dragFrom===null){let best=-1,bd=99999;for(let i=0;i<activeFielders.length;i++){const p=FIELD_POS[activeFielders[i]],cx=4*p.x,cy=2.6*p.y,d=(cx-x)*(cx-x)+(cy-y)*(cy-y);if(d<bd){bd=d;best=i;}} if(best===0){toast("WK is fixed","err");return;} dragFrom=best;drawField();return;}
+  let tgt=1,td=99999;for(let j=1;j<FIELD_POS.length;j++){const cx=4*FIELD_POS[j].x,cy=2.6*FIELD_POS[j].y,d=(cx-x)*(cx-x)+(cy-y)*(cy-y);if(d<td){td=d;tgt=j;}}
+  activeFielders[dragFrom]=tgt;dragFrom=null;drawField();
+}
+function confirmField(){toast("Field updated","ok");closeField();}
+
+/* =========================
+   21) BOTTOM BAR
+========================= */
+function toggleHL(){highLights=!highLights;toast("Highlights "+(highLights?"ON":"OFF"));}
+function toggleAuto(){autoPlay=!autoPlay;toast("Auto "+(autoPlay?"ON":"OFF"));if(autoPlay)autoLoop();else stopAll();}
+function nextBallNow(){simBall();}
+function playOverNow(){for(let i=0;i<6;i++){if((innings===1&&(wk1>=10||balls1>=120))||(innings===2&&(wk2>=10||balls2>=120||score2>target)))break;simBall();}}
+function openMenu(){toast("Menu in Part 2");}
+function manualChangeBowler(){currentBowlerIdx=pickNextBowler();updatePanels();toast("Bowler changed","ok");}
+function autoLoop(){stopAll();const step=function(){if(!autoPlay)return; if((innings===2&&(wk2>=10||balls2>=120||score2>target)))return; simBall(); let d=220; if(highLights){const last=commBalls[commBalls.length-1]||".";d=(last==="4"||last==="6"||last==="W")?1200:60;} autoTimer=setTimeout(step,d);};autoTimer=setTimeout(step,120);}
+
+/* =========================
+   22) SEASON MODE (base)
+========================= */
+function seasonInit(team){
+  const teams=IPL_META.map(function(t){return t.k;});seasonData.fixtures=[];seasonData.table={};seasonData.history=[];seasonData.played=0;
+  for(let i=0;i<teams.length;i++) seasonData.table[teams[i]]={P:0,W:0,L:0,NRR:0,Pts:0,team:teams[i]};
+  let md=1;for(let i=0;i<teams.length;i++){for(let j=i+1;j<teams.length;j++){seasonData.fixtures.push({home:teams[i],away:teams[j],md:md++,res:null});seasonData.fixtures.push({home:teams[j],away:teams[i],md:md++,res:null});}}
+  toast("Season fixtures generated: "+seasonData.fixtures.length,"ok");
+}
+
+/* =========================
+   23) ORANGE/PURPLE (base)
+========================= */
+function updateCapsStub(){}
+
+/* =========================
+   24) STATS (base)
+========================= */
+function buildStats(){}
+
+/* =========================
+   25) buildStats function placeholder done above
+========================= */
+function openConditions(){document.getElementById("condOverlay").classList.add("show");}
+function closeConditions(){document.getElementById("condOverlay").classList.remove("show");}
+function addComm(sym){commBalls.push(sym);if(commBalls.length>60)commBalls.shift();document.getElementById("commText").textContent=sym==="W"?"WICKET!":(sym==="6"?"SIX!":(sym==="4"?"FOUR!":"Ball: "+sym));}
+function renderComm(){
+  const g=document.getElementById("commGrid");let h="",start=Math.max(0,commBalls.length-24);
+  for(let i=start;i<commBalls.length;i++){const s=commBalls[i];let c="";if(s==="4")c=" b4";if(s==="6")c=" b6";if(s==="W")c=" bw";if(s==="Wd"||s==="NB")c=" bex";h+='<div class="ball'+c+'">'+s+"</div>";}
+  g.innerHTML=h;document.getElementById("overBar").textContent="Over: "+(innings===1?fmtOv(balls1):fmtOv(balls2));
+}
+function updatePanels(){
+  const batTeam=(innings===1?G.myBat:G.aiBat);const bowlTeam=(innings===1?G.aiBowl:G.myBowl);
+  const s=batTeam[striker]||{name:"-",hand:"RHB",_r:0,_b:0},ns=batTeam[nonStriker]||{name:"-",hand:"RHB",_r:0,_b:0};
+  document.getElementById("batA").textContent="["+s.hand+"] "+pn(s)+" "+(s._r||0)+"("+(s._b||0)+")";
+  document.getElementById("batB").textContent="["+ns.hand+"] "+pn(ns)+" "+(ns._r||0)+"("+(ns._b||0)+")";
+  const b=bowlTeam[currentBowlerIdx]||{name:"-"};document.getElementById("bowName").textContent=pn(b);
+  const o=bowlerOvers[currentBowlerIdx]||0,r=bowlerRuns[currentBowlerIdx]||0,w=bowlerWkts[currentBowlerIdx]||0,e=o?((r/o).toFixed(1)):"0.0";
+  document.getElementById("bowStats").textContent=o+".0 "+r+" "+w+" "+e;
+  const st=bowlerStam[currentBowlerIdx]||100;const col=st>60?"#22c55e":(st>30?"#f59e0b":"#ef4444");
+  const sb=document.getElementById("stamBar");sb.style.width=st+"%";sb.style.background=col;
+  const myBattingNow=(innings===1?M.meBatFirst:!M.meBatFirst);document.getElementById("batPanel").style.display=myBattingNow?"block":"none";document.getElementById("bowlPanel").style.display=myBattingNow?"none":"block";
+}
+function updateScorebar(){
+  const b=(innings===1?balls1:balls2),ov=fmtOv(b),sc=(innings===1?score1+"/"+wk1:score2+"/"+wk2);
+  const bt=innings===1?(M.meBatFirst?myTeam:oppTeam):(M.meBatFirst?oppTeam:myTeam);
+  let need="";if(innings===2){const req=Math.max(0,target-score2),rem=Math.max(0,120-balls2);need="Need "+req+" off "+rem;}
+  document.getElementById("sbLeft").innerHTML=bt+" — "+(innings===1?"INN 1":"CHASE")+" "+((Math.floor(b/6)+1)<=6?'<span id="ppBadge" class="pp">PP</span>':'');
+  document.getElementById("sbMid").textContent=sc;document.getElementById("sbRight").textContent="("+ov+"/20) "+need;
+}
+
+/* INIT */
+/* ===== PART 2 PATCH START ===== */
+
+/* ---------- DATA EXPANSION HELPERS ---------- */
+function mkP(n,r,h,b,bo,ba,bs,bva,bec,w,inn,ov,f,fit,cap,os){
+  return {name:n,role:r,emoji:(r==="wk"?"🧤":(r==="all"?"🌀":(r==="spin"?"🧿":"🎯"))),hand:h,bat:b,bowl:bo,bat_avg:ba,bat_sr:bs,bowl_avg:bva,bowl_econ:bec,wkts:w,inns:inn,overs:ov,form:f,fitness:fit,cap:cap,os:os};
+}
+function fillTeamIfShort(k,arr){
+  if(!IPL2026[k]) IPL2026[k]=[];
+  for(let i=0;i<arr.length;i++) IPL2026[k].push(arr[i]);
+}
+
+/* ---------- COMPLETE TEAM FILL (compact realistic coverage) ---------- */
+fillTeamIfShort("DC",[
+  mkP("Axar Patel","all","LHB",82,84,28.9,136,25.2,7.2,132,168,512,4,90,true,false),
+  mkP("KL Rahul","wk","RHB",90,1,38.4,135,0,0,null,204,0,4,91,true,false),
+  mkP("Kuldeep Yadav","spin","LHB",31,90,9.6,98,21.1,7.0,184,66,548,5,89,true,false),
+  mkP("Mitchell Starc*","bowl","LHB",28,92,11.4,109,22.5,7.5,198,74,576,4,86,true,true),
+  mkP("David Miller*","bat","LHB",86,5,35.2,144,0,0,null,210,10,4,87,true,true),
+  mkP("Mukesh Kumar","bowl","RHB",22,78,8.1,92,29.2,8.6,73,28,214,3,84,true,false),
+  mkP("T Natarajan","bowl","LHB",17,81,7.3,88,24.9,7.8,122,24,384,3,83,true,false),
+  mkP("Prithvi Shaw","bat","RHB",81,4,26.7,147,0,0,null,122,2,2,82,true,false),
+  mkP("Nitish Rana","bat","LHB",79,22,29.1,136,38.2,8.9,21,154,66,3,85,true,false),
+  mkP("Abishek Porel","wk","LHB",74,1,24.6,139,0,0,null,64,0,3,86,false,false),
+  mkP("Tristan Stubbs*","bat","RHB",83,15,31.8,154,33.0,8.5,11,93,22,4,89,true,true)
+]);
+
+fillTeamIfShort("GT",[
+  mkP("Shubman Gill","bat","RHB",94,5,39.1,139,0,0,null,170,8,5,92,true,false),
+  mkP("Sai Sudharsan","bat","LHB",88,3,36.2,136,0,0,null,112,0,4,90,true,false),
+  mkP("Rashid Khan*","spin","RHB",56,94,18.4,141,14.4,6.2,118,132,408,5,91,true,true),
+  mkP("Mohammed Siraj","bowl","RHB",25,86,10.2,96,24.6,7.9,146,62,478,4,88,true,false),
+  mkP("Kagiso Rabada*","bowl","RHB",24,90,9.9,97,22.1,7.7,201,73,596,4,87,true,true),
+  mkP("Jos Buttler*","wk","RHB",93,1,35.8,148,0,0,null,232,0,4,88,true,true),
+  mkP("Washington Sundar","all","RHB",73,76,24.8,126,29.9,7.3,72,124,312,3,86,true,false),
+  mkP("Rahul Tewatia","all","LHB",78,54,25.2,148,34.5,8.7,37,96,86,3,85,true,false),
+  mkP("Prasidh Krishna","bowl","RHB",21,82,8.4,90,27.1,8.2,99,34,302,3,84,true,false),
+  mkP("Sai Kishore","spin","LHB",30,80,11.0,103,24.4,7.1,68,22,260,3,86,true,false),
+  mkP("Jason Holder*","all","RHB",76,80,23.1,139,26.3,8.1,148,168,498,3,85,true,true)
+]);
+
+fillTeamIfShort("KKR",[
+  mkP("Ajinkya Rahane","bat","RHB",82,10,31.9,126,0,0,null,214,18,3,86,true,false),
+  mkP("Rinku Singh","bat","LHB",86,8,33.0,148,0,0,null,102,5,4,90,true,false),
+  mkP("Varun Chakravarthy","spin","RHB",27,89,9.4,92,20.8,6.9,154,41,472,5,89,true,false),
+  mkP("Sunil Narine*","all","LHB",72,88,19.2,164,22.9,6.4,201,232,824,4,88,true,true),
+  mkP("Cameron Green*","all","RHB",84,74,31.4,145,29.1,8.2,62,116,210,3,86,true,true),
+  mkP("Rahul Tripathi","bat","RHB",80,6,27.5,140,0,0,null,136,0,3,85,true,false),
+  mkP("Manish Pandey","bat","RHB",76,5,29.8,125,0,0,null,198,0,2,82,true,false),
+  mkP("Umran Malik","bowl","RHB",18,79,7.3,87,29.4,9.1,69,18,188,2,80,true,false),
+  mkP("Vaibhav Arora","bowl","RHB",16,73,6.2,85,31.0,8.8,42,12,140,2,79,false,false),
+  mkP("Matheesha Pathirana*","bowl","RHB",19,87,7.0,90,23.9,7.8,91,24,264,4,87,true,true),
+  mkP("Finn Allen*","wk","RHB",81,1,28.1,161,0,0,null,84,0,3,86,true,true)
+]);
+
+fillTeamIfShort("LSG",[
+  mkP("Rishabh Pant","wk","LHB",90,1,34.2,146,0,0,null,176,0,4,88,true,false),
+  mkP("Nicholas Pooran*","wk","LHB",89,1,31.5,159,0,0,null,188,0,4,89,true,true),
+  mkP("Aiden Markram*","all","RHB",82,55,33.2,136,35.1,8.5,34,176,88,3,87,true,true),
+  mkP("Mitchell Marsh*","all","RHB",86,68,31.9,149,28.9,8.4,74,142,196,3,84,true,true),
+  mkP("Wanindu Hasaranga*","all","RHB",67,88,17.2,146,18.7,6.8,198,122,510,4,86,true,true),
+  mkP("Mohammed Shami","bowl","RHB",22,89,8.2,91,23.8,7.6,214,66,662,4,85,true,false),
+  mkP("Mayank Yadav","bowl","RHB",18,83,7.0,93,25.9,8.1,48,10,124,3,80,false,false),
+  mkP("Avesh Khan","bowl","RHB",20,80,8.1,95,27.8,8.4,118,32,390,3,83,true,false),
+  mkP("Ayush Badoni","bat","RHB",75,12,26.5,136,42.0,9.1,7,94,18,3,86,false,false),
+  mkP("Shahbaz Ahmed","all","LHB",70,71,22.6,127,30.5,7.7,64,104,260,3,84,true,false),
+  mkP("Mohsin Khan","bowl","LHB",15,78,6.0,84,26.6,8.0,53,11,172,3,81,false,false)
+]);
+
+fillTeamIfShort("PBKS",[
+  mkP("Shreyas Iyer","bat","RHB",88,6,32.8,134,0,0,null,186,12,4,89,true,false),
+  mkP("Yuzvendra Chahal","spin","RHB",24,90,8.9,90,21.7,7.5,221,60,640,4,88,true,false),
+  mkP("Arshdeep Singh","bowl","LHB",19,84,7.2,88,24.8,8.1,137,28,420,4,87,true,false),
+  mkP("Marcus Stoinis*","all","RHB",83,70,29.2,146,31.1,8.6,82,152,232,3,86,true,true),
+  mkP("Marco Jansen*","all","LHB",75,81,20.4,136,25.7,8.0,112,92,334,3,85,true,true),
+  mkP("Lockie Ferguson*","bowl","RHB",16,86,7.0,90,23.9,8.2,129,30,372,3,83,true,true),
+  mkP("Prabhsimran Singh","wk","RHB",78,1,25.0,145,0,0,null,110,0,3,85,false,false),
+  mkP("Nehal Wadhera","bat","LHB",79,5,27.2,141,0,0,null,86,4,3,86,false,false),
+  mkP("Harpreet Brar","spin","LHB",55,76,17.3,130,27.5,7.4,58,74,190,3,84,true,false),
+  mkP("Shashank Singh","bat","RHB",77,10,24.9,149,39.5,8.8,13,90,34,3,84,false,false),
+  mkP("Vijaykumar Vyshak","bowl","RHB",14,75,6.1,86,30.7,8.9,36,8,110,2,80,false,false)
+]);
+
+fillTeamIfShort("RR",[
+  mkP("Riyan Parag","all","RHB",84,54,30.6,144,36.8,8.7,26,132,74,4,88,true,false),
+  mkP("Yashasvi Jaiswal","bat","LHB",92,4,33.4,152,0,0,null,126,0,5,92,true,false),
+  mkP("Dhruv Jurel","wk","RHB",80,1,28.0,141,0,0,null,84,0,4,88,true,false),
+  mkP("Ravindra Jadeja","all","LHB",81,87,29.1,130,24.1,7.0,214,246,792,4,89,true,false),
+  mkP("Ravi Bishnoi","spin","RHB",28,85,10.1,101,23.4,7.3,132,40,402,4,88,true,false),
+  mkP("Jofra Archer*","bowl","RHB",26,90,11.5,112,22.7,7.6,149,52,442,4,84,true,true),
+  mkP("Shimron Hetmyer*","bat","LHB",84,4,28.6,153,0,0,null,170,0,3,86,true,true),
+  mkP("Adam Milne*","bowl","RHB",17,82,7.6,91,25.9,8.1,89,20,280,3,81,true,true),
+  mkP("Sandeep Sharma","bowl","RHB",18,79,8.0,89,26.5,7.9,124,36,396,3,83,true,false),
+  mkP("Tushar Deshpande","bowl","RHB",17,76,7.1,87,29.8,8.9,74,18,188,3,82,false,false),
+  mkP("Shubham Dubey","bat","RHB",72,6,23.8,138,0,0,null,58,0,2,83,false,false)
+]);
+
+fillTeamIfShort("SRH",[
+  mkP("Pat Cummins*","bowl","RHB",58,90,17.0,145,23.6,7.5,172,180,640,4,88,true,true),
+  mkP("Ishan Kishan","wk","LHB",86,1,30.7,141,0,0,null,190,0,4,89,true,false),
+  mkP("Abhishek Sharma","all","LHB",84,49,28.9,151,38.2,8.9,22,120,74,4,88,true,false),
+  mkP("Nitish Kumar Reddy","all","RHB",79,58,27.3,144,34.7,8.6,28,96,96,4,87,true,false),
+  mkP("Travis Head*","bat","LHB",91,8,34.5,154,0,0,null,180,12,5,90,true,true),
+  mkP("Heinrich Klaasen*","wk","RHB",92,1,36.1,160,0,0,null,172,0,5,89,true,true),
+  mkP("Harshal Patel","bowl","LHB",31,82,13.8,126,24.7,8.4,181,98,544,4,86,true,false),
+  mkP("Jaydev Unadkat","bowl","LHB",20,76,9.0,96,29.5,8.7,104,42,404,3,82,true,false),
+  mkP("Shivam Mavi","bowl","RHB",16,74,7.1,89,31.2,8.9,56,16,180,2,80,false,false),
+  mkP("Liam Livingstone*","all","RHB",85,56,30.2,157,34.0,8.8,44,136,120,3,86,true,true),
+  mkP("Kamindu Mendis*","all","LHB",77,62,32.4,138,31.7,8.2,51,122,148,3,85,true,true)
+]);
+
+/* ensure 11 players for any sparse team */
+(function ensureAllTeams(){
+  const keys=IPL_META.map(t=>t.k);
+  for(let i=0;i<keys.length;i++){
+    const k=keys[i];
+    if(!IPL2026[k]) IPL2026[k]=[];
+    while(IPL2026[k].length<11){
+      IPL2026[k].push(mkP(k+" Player "+(IPL2026[k].length+1),"bat","RHB",70,20,24.0,130,0,0,null,40,0,2,80,false,false));
+    }
+  }
+})();
+
+/* ---------- FULL H2H GENERATION (45 combos) ---------- */
+function hKey(a,b){return a+"|"+b;}
+function putH2H(a,b,avg1,avg2,w1){H2H[hKey(a,b)]={avg1st:avg1,avg2nd:avg2,team1WinPct:w1};}
+(function buildH2H45(){
+  const t=IPL_META.map(x=>x.k);
+  for(let i=0;i<t.length;i++){
+    for(let j=i+1;j<t.length;j++){
+      const a=t[i],b=t[j];
+      if(!H2H[hKey(a,b)]){
+        const base1=rndi(164,178),base2=base1-rndi(4,9),w=rndi(42,58);
+        putH2H(a,b,base1,base2,w);
+      }
+    }
+  }
+})();
+
+/* ---------- AUCTION POOL EXPANSION TO 25 ---------- */
+(function fillPool25(){
+  const seed=[
+    ["S. Blaze","BAT","IN",84,10,34,146,0,150,"Bat1"],["T. Orbit","WK","ENG",80,1,30,150,0,150,"Bat1"],
+    ["J. Forge","ALL-R","AUS",82,74,29,148,66,150,"AR1"],["P. Vortex","FAST","NZ",24,86,11,102,141,150,"Fast1"],
+    ["N. Drift","SPIN","SL",33,84,14,118,122,150,"Spin1"],["L. Comet","BAT","IN",78,8,27,142,0,100,"Bat1"],
+    ["Z. Edge","BAT","SA",81,12,31,144,3,100,"Bat1"],["R. Titan","ALL-R","WI",80,72,28,152,55,100,"AR1"],
+    ["D. Steel","FAST","IN",19,82,8,92,102,100,"Fast1"],["Q. Nova","SPIN","AFG",38,88,16,121,188,100,"Spin1"],
+    ["I. Echo","BAT","IN",74,6,24,136,0,75,"Bat2"],["O. Flux","WK","AUS",76,1,26,140,0,75,"Bat2"],
+    ["B. Surge","ALL-R","ENG",77,68,25,145,48,75,"AR2"],["C. Bolt","FAST","SA",18,80,7,90,88,75,"Fast2"],
+    ["M. Halo","SPIN","IN",35,79,13,116,96,75,"Spin2"],["Y. Frost","BAT","NZ",79,9,29,143,1,50,"Bat2"],
+    ["A. Riptide","ALL-R","IN",73,66,23,137,39,50,"AR2"],["K. Arrow","FAST","WI",15,78,6,88,74,50,"Fast2"],
+    ["G. Prism","SPIN","IN",31,76,12,110,70,50,"Spin2"],["U. Phantom","BAT","PAK",82,7,32,147,0,125,"Marquee"]
+  ];
+  let id=PALL.length+1;
+  for(let i=0;i<seed.length && PALL.length<25;i++){
+    const s=seed[i];
+    PALL.push({id:id++,code:s[0],role:s[1],emoji:(s[1]==="WK"?"🧤":(s[1]==="ALL-R"?"🌀":(s[1]==="SPIN"?"🧿":"🎯"))),country:s[2],bat:s[3],bowl:s[4],avg:s[5],sr:s[6],wkts:s[7],baseL:s[8],set:s[9]});
+  }
+})();
+
+/* ---------- SEASON MODE COMPLETE ---------- */
+function getH2H(a,b){
+  if(H2H[a+"|"+b]) return {d:H2H[a+"|"+b],flip:false};
+  if(H2H[b+"|"+a]) return {d:H2H[b+"|"+a],flip:true};
+  return {d:{avg1st:170,avg2nd:163,team1WinPct:50},flip:false};
+}
+function teamStrength(k){
+  const s=IPL2026[k]||[];let sum=0;
+  for(let i=0;i<Math.min(11,s.length);i++) sum += (s[i].bat*0.55 + s[i].bowl*0.45);
+  return sum/11;
+}
+function seasonInit(team){
+  const teams=IPL_META.map(function(t){return t.k;});
+  seasonData.fixtures=[];seasonData.table={};seasonData.history=[];seasonData.played=0;seasonData.total=74;
+  seasonData.caps={orange:{},purple:{}};
+  for(let i=0;i<teams.length;i++) seasonData.table[teams[i]]={P:0,W:0,L:0,NRR:0,Pts:0,team:teams[i],RF:0,RA:0,BF:0,BA:0};
+  let md=1;
+  for(let i=0;i<teams.length;i++){
+    for(let j=i+1;j<teams.length;j++){
+      seasonData.fixtures.push({id:seasonData.fixtures.length+1,home:teams[i],away:teams[j],md:md++,venue:teams[i]+" Home",res:null,pom:""});
+      seasonData.fixtures.push({id:seasonData.fixtures.length+1,home:teams[j],away:teams[i],md:md++,venue:teams[j]+" Home",res:null,pom:""});
+    }
+  }
+  // playoffs placeholders -> total 74
+  seasonData.fixtures.push({id:71,home:"T1",away:"T2",md:71,venue:"Playoff",res:null,playoff:"Q1",pom:""});
+  seasonData.fixtures.push({id:72,home:"T3",away:"T4",md:72,venue:"Playoff",res:null,playoff:"ELIM",pom:""});
+  seasonData.fixtures.push({id:73,home:"LQ1",away:"WELIM",md:73,venue:"Playoff",res:null,playoff:"Q2",pom:""});
+  seasonData.fixtures.push({id:74,home:"WQ1",away:"WQ2",md:74,venue:"Final",res:null,playoff:"FINAL",pom:""});
+  toast("Season ready: 74 matches","ok");
+}
+function recordCapRuns(team,player,runs){
+  const key=team+"|"+player;
+  if(!seasonData.caps.orange[key]) seasonData.caps.orange[key]={team:team,player:player,runs:0,matches:0};
+  seasonData.caps.orange[key].runs += runs;
+}
+function recordCapWkts(team,player,w,econ){
+  const key=team+"|"+player;
+  if(!seasonData.caps.purple[key]) seasonData.caps.purple[key]={team:team,player:player,wkts:0,econSum:0,spells:0};
+  seasonData.caps.purple[key].wkts += w; seasonData.caps.purple[key].econSum += econ; seasonData.caps.purple[key].spells += 1;
+}
+function finalizeCapMatchTeams(a,b){
+  const ta=IPL2026[a]||[],tb=IPL2026[b]||[];
+  for(let i=0;i<11;i++){
+    if(ta[i]){ if(!seasonData.caps.orange[a+"|"+ta[i].name]) seasonData.caps.orange[a+"|"+ta[i].name]={team:a,player:ta[i].name,runs:0,matches:0}; seasonData.caps.orange[a+"|"+ta[i].name].matches+=1; }
+    if(tb[i]){ if(!seasonData.caps.orange[b+"|"+tb[i].name]) seasonData.caps.orange[b+"|"+tb[i].name]={team:b,player:tb[i].name,runs:0,matches:0}; seasonData.caps.orange[b+"|"+tb[i].name].matches+=1; }
+  }
+}
+function simulateAIVsAI(fx){
+  const a=fx.home,b=fx.away,ha=getH2H(a,b),d=ha.d,flip=ha.flip;
+  const sA=teamStrength(a),sB=teamStrength(b),homeAdv=rnd(1.02,1.10);
+  let first=Math.round(d.avg1st*homeAdv + (sA-sB)*0.18 + rnd(-20,20));
+  let second=Math.round(d.avg2nd + (sB-sA)*0.18 + rnd(-20,20));
+  first=clamp(first,120,245);second=clamp(second,105,240);
+  const wBase=flip?(100-d.team1WinPct):d.team1WinPct;
+  const pA=clamp(wBase + (sA-sB)*0.2 + (homeAdv-1)*100*0.9,25,75);
+  const aWin=Math.random()*100<pA;
+  const w1=rndi(3,9),w2=rndi(3,9);
+  let rfA,rfB,bf=120,ba=120,resultText,winner,loser;
+  if(aWin){rfA=Math.max(first,second+1);rfB=Math.min(second,rfA-1);winner=a;loser=b;resultText=a+" won";}
+  else{rfB=Math.max(first,second+1);rfA=Math.min(second,rfB-1);winner=b;loser=a;resultText=b+" won";}
+  const pomTeam=(Math.random()<0.55?winner:loser), pomPlayer=(IPL2026[pomTeam]&&IPL2026[pomTeam][rndi(0,10)]?IPL2026[pomTeam][rndi(0,10)].name:"Player");
+  fx.res={a:a,b:b,ra:rfA,wa:w1,rb:rfB,wb:w2,text:resultText,winner:winner};fx.pom=pomPlayer;
+  // table
+  const TA=seasonData.table[a],TB=seasonData.table[b];
+  TA.P++;TB.P++; TA.RF+=rfA;TA.RA+=rfB;TB.RF+=rfB;TB.RA+=rfA; TA.BF+=bf;TA.BA+=ba;TB.BF+=ba;TB.BA+=bf;
+  if(winner===a){TA.W++;TA.Pts+=2;TB.L++;} else {TB.W++;TB.Pts+=2;TA.L++;}
+  TA.NRR=((TA.RF/Math.max(1,TA.BF/6))-(TA.RA/Math.max(1,TA.BA/6))).toFixed(3)-0;
+  TB.NRR=((TB.RF/Math.max(1,TB.BF/6))-(TB.RA/Math.max(1,TB.BA/6))).toFixed(3)-0;
+  seasonData.played++;
+
+  // caps synthetic contribution
+  const xa=IPL2026[a]||[], xb=IPL2026[b]||[];
+  for(let i=0;i<Math.min(11,xa.length);i++){const pr=rndi(0,45);recordCapRuns(a,xa[i].name,pr);if(xa[i].bowl>60)recordCapWkts(a,xa[i].name,rndi(0,2),rnd(5.8,9.8));}
+  for(let i=0;i<Math.min(11,xb.length);i++){const pr=rndi(0,45);recordCapRuns(b,xb[i].name,pr);if(xb[i].bowl>60)recordCapWkts(b,xb[i].name,rndi(0,2),rnd(5.8,9.8));}
+  finalizeCapMatchTeams(a,b);
+}
+function seasonSortTable(){
+  const arr=Object.values(seasonData.table);
+  arr.sort(function(x,y){
+    if(y.Pts!==x.Pts) return y.Pts-x.Pts;
+    if(y.NRR!==x.NRR) return y.NRR-x.NRR;
+    return y.W-x.W;
+  });
+  return arr;
+}
+function getOrangeList(){
+  const arr=Object.values(seasonData.caps.orange);arr.sort((a,b)=>b.runs-a.runs);return arr.slice(0,20);
+}
+function getPurpleList(){
+  const arr=Object.values(seasonData.caps.purple).map(x=>({team:x.team,player:x.player,wkts:x.wkts,econ:(x.econSum/Math.max(1,x.spells)).toFixed(2)-0}));
+  arr.sort((a,b)=>b.wkts-a.wkts||a.econ-b.econ);return arr.slice(0,20);
+}
+
+/* ---------- MATCH ENGINE HOOKS FOR CAPS/STATS ---------- */
+function addToMatchHistory(res){
+  if(!GA.matchHistory) GA.matchHistory=[];
+  GA.matchHistory.push(res);
+}
+const _oldMatchEnd = matchEnd;
+matchEnd = function(){
+  stopAll();
+  let resTxt="Tied", won=false;
+  if(score2>=target){won=!M.meBatFirst; resTxt=won?"WON":"LOST";}
+  else {won=M.meBatFirst; resTxt=won?"WON":"LOST";}
+  const r={my:myTeam,opp:oppTeam,s1:score1,w1:wk1,s2:score2,w2:wk2,result:resTxt,date:new Date().toISOString()};
+  addToMatchHistory(r);
+  // simple POM
+  let pom=(Math.random()<0.6? (G.myBat && G.myBat[0]?G.myBat[0].name:"Player") : (G.aiBat && G.aiBat[0]?G.aiBat[0].name:"Player"));
+  alert("Result: "+resTxt+"\n"+myTeam+" "+score1+"/"+wk1+" vs "+oppTeam+" "+score2+"/"+wk2+"\nPlayer of the Match: "+pom);
+};
+
+/* ---------- AUCTION COMPLETE CORE (logic engine) ---------- */
+function auctionInit(mode){
+  auctionState.mode=mode;
+  const n=(mode==="mini"?4:8), budget=(mode==="mini"?3000:9000); // in L
+  const teams=IPL_META.slice(0,n).map(x=>x.k);
+  auctionState.teams=teams;auctionState.purse={};auctionState.squad={};auctionState.rtm={};auctionState.pool=PALL.slice();auctionState.idx=0;
+  auctionState.sold={};auctionState.unsold={};auctionState.skip={};auctionState.current=null;
+  for(let i=0;i<teams.length;i++){auctionState.purse[teams[i]]=budget;auctionState.squad[teams[i]]=[];auctionState.rtm[teams[i]]=(mode==="mini"?3:2);}
+  toast((mode==="mini"?"Mini":"Mega")+" Auction initialized","ok");
+}
+function squadNeedScore(team,pl){
+  const sq=auctionState.squad[team]||[];let bat=0,bow=0,wk=0,sp=0,ar=0;
+  for(let i=0;i<sq.length;i++){const r=sq[i].role;if(r==="BAT")bat++;if(r==="FAST")bow++;if(r==="WK")wk++;if(r==="SPIN")sp++;if(r==="ALL-R")ar++;}
+  let need=1;
+  if(pl.role==="WK" && wk<1) need+=1.2;
+  if(pl.role==="FAST" && bow<3) need+=1.0;
+  if(pl.role==="SPIN" && sp<2) need+=0.9;
+  if(pl.role==="ALL-R" && ar<2) need+=0.8;
+  if(pl.role==="BAT" && bat<4) need+=0.7;
+  if(sq.length>=10) need+=(pl.role==="WK"?0.4:0.1); // accelerated targeting
+  return need;
+}
+function aiBidNext(current,pl){
+  let bestTeam="",bestScore=-1;
+  for(let i=0;i<auctionState.teams.length;i++){
+    const t=auctionState.teams[i];if(t===myTeam) continue;
+    if((auctionState.purse[t]||0) < current+10) continue;
+    const sc=squadNeedScore(t,pl)*rnd(0.85,1.15)+((auctionState.purse[t]||0)/10000);
+    if(sc>bestScore){bestScore=sc;bestTeam=t;}
+  }
+  if(bestScore<0.95) return null;
+  return bestTeam;
+}
+function nextAuctionPlayer(){
+  if(auctionState.idx>=auctionState.pool.length){toast("Auction complete","ok");return null;}
+  const p=auctionState.pool[auctionState.idx++];auctionState.current=p;return p;
+}
+function sellCurrent(toTeam,price){
+  const p=auctionState.current;if(!p)return;
+  auctionState.sold[p.id]={team:toTeam,price:price};
+  auctionState.squad[toTeam].push(p);
+  auctionState.purse[toTeam]-=price;
+}
+function unsoldCurrent(){const p=auctionState.current;if(!p)return;auctionState.unsold[p.id]=true;}
+function skipCurrent(){const p=auctionState.current;if(!p)return;auctionState.skip[p.id]=true;}
+
+/* ---------- FIELD RULE ENFORCEMENT POWERPLAY ---------- */
+const _oldConfirmField = confirmField;
+confirmField = function(){
+  // max 2 outside inner circle in PP
+  const b=(innings===1?balls1:balls2), pp=(Math.floor(b/6)+1)<=6;
+  if(pp){
+    let outside=0;
+    for(let i=0;i<activeFielders.length;i++){
+      const p=FIELD_POS[activeFielders[i]];
+      const dx=(4*p.x)-200,dy=(2.6*p.y)-130;
+      const inInner=((dx*dx)/(90*90)+(dy*dy)/(55*55))<=1;
+      if(!inInner && p.n!=="WK") outside++;
+    }
+    if(outside>2){toast("Powerplay: max 2 outside circle","err");return;}
+  }
+  toast("Field updated","ok");closeField();
+};
+
+/* ---------- SKIP MATCH using H2H ---------- */
+skipMatch = function(){
+  const hk=getH2H(myTeam,oppTeam),d=hk.d,flip=hk.flip;
+  const pMy = flip ? (100-d.team1WinPct) : d.team1WinPct;
+  const myWin=Math.random()*100<pMy;
+  const a=Math.round(d.avg1st+rnd(-20,20)), b=Math.round(d.avg2nd+rnd(-20,20));
+  if(myWin){score1=Math.max(a,b+1);wk1=rndi(3,8);score2=Math.min(b,score1-1);wk2=rndi(4,9);}
+  else{score2=Math.max(a,b+1);wk2=rndi(3,8);score1=Math.min(b,score2-1);wk1=rndi(4,9);}
+  target=score1+1;balls1=120;balls2=rndi(96,120);innings=2;
+  updateScorebar();renderComm();
+  matchEnd();
+};
+
+/* ---------- STATISTICS SCREEN GENERATORS (data only, UI can be added in Part 3 if needed) ---------- */
+function buildStats(){
+  const hist=GA.matchHistory||[];
+  let mostRuns={name:"-",team:"",runs:0,balls:0},bestInn={name:"-",team:"",runs:0,balls:0},bestSR={name:"-",team:"",sr:0};
+  let mostW={name:"-",team:"",wk:0,runs:0},bestFig={name:"-",team:"",wk:0,runs:999},bestEco={name:"-",team:"",eco:999};
+  const teams=IPL_META.map(x=>x.k);
+  for(let ti=0;ti<teams.length;ti++){
+    const t=teams[ti],s=IPL2026[t]||[];
+    for(let i=0;i<Math.min(11,s.length);i++){
+      const p=s[i];
+      const rr=Math.round((p.bat_avg||20)*0.9 + rnd(0,120));
+      const bb=Math.max(1,Math.round(rr/(Math.max(80,p.bat_sr||120)/100)));
+      const sr=(rr*100/bb);
+      if(rr>mostRuns.runs) mostRuns={name:p.name,team:t,runs:rr,balls:bb};
+      if(rr>bestInn.runs) bestInn={name:p.name,team:t,runs:rr,balls:bb};
+      if(sr>bestSR.sr && bb>=20) bestSR={name:p.name,team:t,sr:sr.toFixed(1)-0};
+      if((p.wkts||0)>0){
+        const w=rndi(0,6),r=rndi(8,48),eco=(r/4).toFixed(2)-0;
+        if(w>mostW.wk) mostW={name:p.name,team:t,wk:w,runs:r};
+        if(w>bestFig.wk || (w===bestFig.wk && r<bestFig.runs)) bestFig={name:p.name,team:t,wk:w,runs:r};
+        if(eco<bestEco.eco) bestEco={name:p.name,team:t,eco:eco};
+      }
+    }
+  }
+  GA.records={mostRuns:mostRuns,bestInn:bestInn,bestSR:bestSR,mostW:mostW,bestFig:bestFig,bestEco:bestEco,history:hist};
+  return GA.records;
+}
+
+/* ---------- MODE ROUTING OVERRIDES ---------- */
+const _oldGoMode = goMode;
+goMode = function(m){
+  gameMode=m;document.getElementById("hdrMode").textContent=m.toUpperCase();
+  if(m==="quick"){buildTeamGrid();ss("teamsel");return;}
+  if(m==="season"){buildTeamGrid();ss("teamsel");seasonInit("");toast("Pick your team for season","ok");return;}
+  if(m==="mini"){auctionInit("mini");toast("Mini auction engine ready (core logic active)","ok");return;}
+  if(m==="mega"){auctionInit("mega");toast("Mega auction engine ready (core logic active)","ok");return;}
+  _oldGoMode(m);
+};
+
+/* ---------- TEAM CHOOSE OVERRIDE FOR SEASON ---------- */
+const _oldChooseTeam = chooseTeam;
+chooseTeam = function(k){
+  myTeam=k;
+  if(gameMode==="season"){seasonInit(k);toast("Season started with "+k,"ok");}
+  _oldChooseTeam(k);
+};
+
+/* ---------- INIT REPLACE ---------- */
+(function initPart2(){
+  buildTeamGrid();
+  toast("BidXI Part 2 loaded: season+auction+data extended","ok");
+})();
+
+/* ===== PART 2 PATCH END ===== */
+    /* ===== PART 3 PATCH START ===== */
+
+/* ---------- EXTRA GLOBALS (declared once; safe append if missing) ---------- */
+if(typeof SFX==="undefined"){var SFX={ctx:null,enabled:true,thrillOn:false,thrillTimer:null};}
+if(typeof seasonView==="undefined"){var seasonView={tab:"table"};}
+if(typeof auctionView==="undefined"){var auctionView={running:false,bidTeam:"",bidPrice:0,timeLeft:5,timer:null,log:[]};}
+
+/* ---------- DOM INJECTION: SEASON + AUCTION SCREENS ---------- */
+(function injectExtraScreens(){
+  const app=document.getElementById("app");
+  if(!document.getElementById("screen-season")){
+    const sec=document.createElement("section");
+    sec.id="screen-season";sec.className="screen";
+    sec.innerHTML=
+      '<div class="card">'+
+        '<div class="row sp"><h3 style="margin:0">IPL 2026 Season</h3><span class="badge" id="seasonProg">0/74</span></div>'+
+        '<div class="row" style="margin:8px 0">'+
+          '<button class="btn" onclick="seasonTab(\'table\')">Points</button>'+
+          '<button class="btn" onclick="seasonTab(\'fix\')">Fixtures</button>'+
+          '<button class="btn" onclick="seasonTab(\'orange\')">Orange</button>'+
+          '<button class="btn" onclick="seasonTab(\'purple\')">Purple</button>'+
+        '</div>'+
+        '<div id="seasonBody"></div>'+
+        '<div class="row sp" style="margin-top:8px">'+
+          '<button class="btn" onclick="ss(\'home\')">← Home</button>'+
+          '<button class="btn gold" onclick="seasonPlayNextMy()">Play My Next Match</button>'+
+          '<button class="btn" onclick="seasonSimToMyNext()">Skip AI Matches</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="footer-legal">⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.</div>';
+    app.appendChild(sec);
+  }
+  if(!document.getElementById("screen-auction")){
+    const auc=document.createElement("section");
+    auc.id="screen-auction";auc.className="screen";
+    auc.innerHTML=
+      '<div class="card">'+
+        '<div class="row sp"><h3 style="margin:0">Auction Arena</h3><span class="badge" id="aucMode">MINI</span></div>'+
+        '<div class="grid2">'+
+          '<div class="card" style="padding:8px">'+
+            '<div id="aucPlayer" style="font-size:18px;font-weight:700">No player</div>'+
+            '<div class="small muted" id="aucMeta">Role · Country · Base</div>'+
+            '<svg id="countRing" viewBox="0 0 120 120" style="width:120px;height:120px;margin-top:6px"></svg>'+
+            '<div class="row" style="margin-top:8px">'+
+              '<button class="btn green" onclick="aucBid()">Bid +10L</button>'+
+              '<button class="btn" onclick="aucSkipPlayer()">Skip Player</button>'+
+              '<button class="btn red" onclick="aucUnsold()">Unsold</button>'+
+            '</div>'+
+            '<div class="row" style="margin-top:8px">'+
+              '<button class="btn gold" onclick="aucNext()">Next Player</button>'+
+              '<button class="btn" onclick="ss(\'home\')">Home</button>'+
+            '</div>'+
+          '</div>'+
+          '<div class="card" style="padding:8px">'+
+            '<h4 style="margin:0 0 6px">Purse</h4>'+
+            '<div id="aucPurse"></div>'+
+            '<h4 style="margin:8px 0 6px">Bid Log</h4>'+
+            '<div id="aucLog" style="max-height:180px;overflow:auto;border:1px solid #243b66;border-radius:8px;padding:6px;background:#081225"></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="footer-legal">⚖️ Not affiliated with IPL or BCCI. Fan & educational use only.</div>';
+    app.appendChild(auc);
+  }
+})();
+
+/* ---------- CSS append ---------- */
+(function injectExtraStyle(){
+  const st=document.createElement("style");
+  st.textContent=
+    '.ttop{font-family:Orbitron} .tbl{width:100%;border-collapse:collapse} .tbl th,.tbl td{padding:6px;border-bottom:1px solid #1f1430}'+
+    '.qrow{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px;border-bottom:1px solid #1f1430}'+
+    '.good{color:#22c55e}.bad{color:#ef4444}.warn{color:#f59e0b}';
+  document.head.appendChild(st);
+})();
+
+/* ---------- SFX ENGINE (offline synth) ---------- */
+function sfxInit(){
+  if(SFX.ctx) return;
+  const C=window.AudioContext||window.webkitAudioContext;
+  if(!C){SFX.enabled=false;return;}
+  SFX.ctx=new C();
+}
+function sfxTone(freq,dur,type,vol,start){
+  if(!SFX.enabled||!SFX.ctx) return;
+  const t0=SFX.ctx.currentTime+(start||0);
+  const o=SFX.ctx.createOscillator(),g=SFX.ctx.createGain(),f=SFX.ctx.createBiquadFilter();
+  o.type=type||"sine";o.frequency.setValueAtTime(freq,t0);
+  f.type="lowpass";f.frequency.setValueAtTime(2000,t0);
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(vol||0.08,t0+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+(dur||0.12));
+  o.connect(f);f.connect(g);g.connect(SFX.ctx.destination);
+  o.start(t0);o.stop(t0+(dur||0.12)+0.02);
+}
+function sfxNoise(dur,vol,start){
+  if(!SFX.enabled||!SFX.ctx) return;
+  const sr=SFX.ctx.sampleRate, len=Math.floor(sr*(dur||0.08));
+  const b=SFX.ctx.createBuffer(1,len,sr),data=b.getChannelData(0);
+  for(let i=0;i<len;i++) data[i]=(Math.random()*2-1)*0.5;
+  const src=SFX.ctx.createBufferSource();src.buffer=b;
+  const f=SFX.ctx.createBiquadFilter();f.type="highpass";f.frequency.value=1200;
+  const g=SFX.ctx.createGain();const t0=SFX.ctx.currentTime+(start||0);
+  g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(vol||0.06,t0+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t0+(dur||0.08));
+  src.connect(f);f.connect(g);g.connect(SFX.ctx.destination);src.start(t0);src.stop(t0+(dur||0.08)+0.02);
+}
+function playBatBall(){ sfxInit(); sfxTone(220,0.09,"triangle",0.1,0); sfxTone(330,0.07,"square",0.07,0.02); sfxNoise(0.05,0.03,0); }
+function playFour(){ sfxInit(); sfxTone(440,0.1,"sawtooth",0.08,0); sfxTone(660,0.12,"triangle",0.07,0.08); }
+function playSix(){ sfxInit(); sfxTone(523,0.12,"sawtooth",0.09,0); sfxTone(659,0.14,"triangle",0.08,0.09); sfxTone(784,0.18,"square",0.06,0.2); }
+function playWicket(){ sfxInit(); sfxNoise(0.18,0.08,0); sfxTone(180,0.15,"sawtooth",0.08,0.02); }
+function startThrillLoop(){
+  sfxInit();
+  if(SFX.thrillOn) return;
+  SFX.thrillOn=true;
+  const pulse=function(){
+    if(!SFX.thrillOn) return;
+    sfxTone(110,0.08,"sine",0.04,0);
+    sfxTone(220,0.06,"triangle",0.03,0.08);
+    SFX.thrillTimer=setTimeout(pulse,680);
+  };
+  pulse();
+}
+function stopThrillLoop(){
+  SFX.thrillOn=false;
+  if(SFX.thrillTimer){clearTimeout(SFX.thrillTimer);SFX.thrillTimer=null;}
+}
+function checkThrill(){
+  if(innings!==2){stopThrillLoop();return;}
+  const req=Math.max(0,target-score2), rem=Math.max(0,120-balls2);
+  const rpoNow = rem>0 ? (req*6/rem) : 99;
+  if((rem<=18 && req<=30) || rpoNow>=10.5) startThrillLoop(); else stopThrillLoop();
+}
+
+/* ---------- HOOK BALL EVENTS FOR SOUND ---------- */
+const _oldAddComm = addComm;
+addComm = function(sym){
+  _oldAddComm(sym);
+  if(sym==="."||sym==="1"||sym==="2"||sym==="3"){ playBatBall(); }
+  else if(sym==="4"){ playBatBall(); playFour(); }
+  else if(sym==="6"){ playBatBall(); playSix(); }
+  else if(sym==="W"){ playWicket(); }
+  else if(sym==="Wd"||sym==="NB"){ sfxTone(360,0.08,"square",0.05,0); }
+  checkThrill();
+};
+
+/* ---------- SEASON UI ---------- */
+function seasonTab(t){seasonView.tab=t;renderSeasonBody();}
+function openSeasonScreen(){document.getElementById("seasonProg").textContent=seasonData.played+"/"+seasonData.total;renderSeasonBody();ss("season");}
+function renderSeasonBody(){
+  const body=document.getElementById("seasonBody"); if(!body) return;
+  document.getElementById("seasonProg").textContent=seasonData.played+"/"+seasonData.total;
+  if(seasonView.tab==="table"){
+    const arr=seasonSortTable();
+    let h='<table class="tbl"><thead><tr><th>Pos</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>NRR</th><th>Pts</th></tr></thead><tbody>';
+    for(let i=0;i<arr.length;i++){
+      const t=arr[i],c=i<4?' style="background:#14321f"':' style="background:#321414"';
+      h+='<tr'+c+'><td>'+(i+1)+'</td><td>'+t.team+'</td><td>'+t.P+'</td><td>'+t.W+'</td><td>'+t.L+'</td><td>'+t.NRR.toFixed? t.NRR.toFixed(3):t.NRR+'</td><td>'+t.Pts+'</td></tr>';
+    }
+    h+='</tbody></table>'; body.innerHTML=h; return;
+  }
+  if(seasonView.tab==="fix"){
+    let h='<div>';
+    for(let i=0;i<seasonData.fixtures.length;i++){
+      const f=seasonData.fixtures[i];
+      if(i>=70 && !f.res){ h+='<div class="qrow"><b>#'+f.id+' '+(f.playoff||"PO")+'</b><span class="muted">Pending playoff slot</span></div>'; continue; }
+      const hh=getH2H(f.home,f.away),d=hh.d,lead=(hh.flip?(100-d.team1WinPct):d.team1WinPct);
+      const s=f.res?('<span class="'+(f.res.winner===myTeam?'good':'')+'">'+f.res.text+' · '+f.res.a+' '+f.res.ra+'/'+f.res.wa+' vs '+f.res.b+' '+f.res.rb+'/'+f.res.wb+'</span>'):'Upcoming · H2H '+f.home+' '+lead+'-'+(100-lead)+' '+f.away;
+      h+='<div class="qrow"><b>#'+f.id+' '+f.home+' vs '+f.away+'</b><span>'+s+'</span></div>';
+    }
+    h+='</div>'; body.innerHTML=h; return;
+  }
+  if(seasonView.tab==="orange"){
+    const arr=getOrangeList(); let h='<table class="tbl"><thead><tr><th>Rank</th><th>Player</th><th>Team</th><th>Runs</th><th>Matches</th></tr></thead><tbody>';
+    for(let i=0;i<arr.length;i++){const r=arr[i],hl=r.team===myTeam?' style="background:#183427"':'';h+='<tr'+hl+'><td>'+(i+1)+'</td><td>'+r.player+'</td><td>'+r.team+'</td><td>'+r.runs+'</td><td>'+r.matches+'</td></tr>';}
+    h+='</tbody></table>'; body.innerHTML=h; return;
+  }
+  if(seasonView.tab==="purple"){
+    const arr=getPurpleList(); let h='<table class="tbl"><thead><tr><th>Rank</th><th>Player</th><th>Team</th><th>Wkts</th><th>Econ</th></tr></thead><tbody>';
+    for(let i=0;i<arr.length;i++){const r=arr[i],hl=r.team===myTeam?' style="background:#183427"':'';h+='<tr'+hl+'><td>'+(i+1)+'</td><td>'+r.player+'</td><td>'+r.team+'</td><td>'+r.wkts+'</td><td>'+r.econ.toFixed? r.econ.toFixed(2):r.econ+'</td></tr>';}
+    h+='</tbody></table>'; body.innerHTML=h; return;
+  }
+}
+function seasonNextMyFixture(){
+  for(let i=0;i<seasonData.fixtures.length;i++){
+    const f=seasonData.fixtures[i];
+    if(f.res) continue;
+    if(f.home===myTeam || f.away===myTeam) return f;
+  }
+  return null;
+}
+function seasonSimToMyNext(){
+  let guard=0;
+  while(guard<500){
+    guard++;
+    const f=seasonData.fixtures.find(x=>!x.res);
+    if(!f) break;
+    if(f.home===myTeam || f.away===myTeam) break;
+    simulateAIVsAI(f);
+  }
+  renderSeasonBody();
+  toast("AI matches simulated to your next game","ok");
+}
+function seasonPlayNextMy(){
+  const f=seasonNextMyFixture();
+  if(!f){toast("No pending match for your team","ok");return;}
+  myTeam=f.home; oppTeam=f.away; myXI=[];
+  const s=IPL2026[myTeam]||[]; for(let i=0;i<11;i++) myXI.push(i);
+  // mark callback at match end
+  GA._seasonFixtureId=f.id;
+  toToss();
+}
+const _oldMatchEndP3 = matchEnd;
+matchEnd = function(){
+  _oldMatchEndP3();
+  stopThrillLoop();
+  if(GA._seasonFixtureId){
+    const fx=seasonData.fixtures.find(x=>x.id===GA._seasonFixtureId);
+    if(fx && !fx.res){
+      const a=fx.home,b=fx.away;
+      const myWon = ((score2>=target)?(!M.meBatFirst):(M.meBatFirst));
+      const winner=myWon?a:b;
+      fx.res={a:a,b:b,ra:score1,wa:wk1,rb:score2,wb:wk2,text:winner+" won",winner:winner};
+      fx.pom=(Math.random()<0.5?(G.myBat&&G.myBat[0]?G.myBat[0].name:"Player"):(G.aiBat&&G.aiBat[0]?G.aiBat[0].name:"Player"));
+
+      const TA=seasonData.table[a],TB=seasonData.table[b];
+      TA.P++;TB.P++; TA.RF+=score1;TA.RA+=score2;TB.RF+=score2;TB.RA+=score1; TA.BF+=Math.max(1,balls1);TA.BA+=Math.max(1,balls2);TB.BF+=Math.max(1,balls2);TB.BA+=Math.max(1,balls1);
+      if(winner===a){TA.W++;TA.Pts+=2;TB.L++;} else {TB.W++;TB.Pts+=2;TA.L++;}
+      TA.NRR=((TA.RF/Math.max(1,TA.BF/6))-(TA.RA/Math.max(1,TA.BA/6))).toFixed(3)-0;
+      TB.NRR=((TB.RF/Math.max(1,TB.BF/6))-(TB.RA/Math.max(1,TB.BA/6))).toFixed(3)-0;
+      seasonData.played++;
+
+      // caps from match batting cards
+      const ta=IPL2026[a]||[],tb=IPL2026[b]||[];
+      for(let i=0;i<11;i++){
+        if(ta[i]){const rr=(ta[i]._r||rndi(0,42));recordCapRuns(a,ta[i].name,rr);if(ta[i].bowl>60)recordCapWkts(a,ta[i].name,rndi(0,3),rnd(5.5,9.8));ta[i]._r=0;ta[i]._b=0;}
+        if(tb[i]){const rr2=(tb[i]._r||rndi(0,42));recordCapRuns(b,tb[i].name,rr2);if(tb[i].bowl>60)recordCapWkts(b,tb[i].name,rndi(0,3),rnd(5.5,9.8));tb[i]._r=0;tb[i]._b=0;}
+      }
+      finalizeCapMatchTeams(a,b);
+    }
+    GA._seasonFixtureId=null;
+    openSeasonScreen();
+  }
+};
+
+/* ---------- AUCTION UI ---------- */
+function openAuctionScreen(){
+  document.getElementById("aucMode").textContent=(auctionState.mode||"mini").toUpperCase();
+  renderAuctionPurse();renderAuctionLog();renderAuctionPlayer();
+  ss("auction");
+}
+function renderAuctionPurse(){
+  const wrap=document.getElementById("aucPurse"); if(!wrap) return;
+  let h="";
+  const max=(auctionState.mode==="mega"?9000:3000);
+  for(let i=0;i<auctionState.teams.length;i++){
+    const t=auctionState.teams[i],p=auctionState.purse[t]||0,pc=Math.round((p/max)*100);
+    h+='<div style="margin-bottom:6px"><div class="row sp"><b>'+t+'</b><span>₹'+(p/100).toFixed(2)+' Cr</span></div><div class="bar"><i style="width:'+pc+'%;background:'+(pc>50?'#22c55e':(pc>25?'#f59e0b':'#ef4444'))+'"></i></div></div>';
+  }
+  wrap.innerHTML=h;
+}
+function renderAuctionLog(){
+  const el=document.getElementById("aucLog"); if(!el) return;
+  let h=""; for(let i=Math.max(0,auctionView.log.length-40);i<auctionView.log.length;i++) h+='<div class="small">'+auctionView.log[i]+'</div>';
+  el.innerHTML=h||'<span class="muted small">No bids yet</span>'; el.scrollTop=el.scrollHeight;
+}
+function ringSVG(sec){
+  const p=clamp(sec/5,0,1), col=(p>0.6?'#22c55e':(p>0.3?'#f59e0b':'#ef4444'));
+  const r=48,c=2*Math.PI*r,off=c*(1-p);
+  return '<circle cx="60" cy="60" r="48" fill="none" stroke="#22395f" stroke-width="10"/>'+
+         '<circle cx="60" cy="60" r="48" fill="none" stroke="'+col+'" stroke-width="10" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 60 60)"/>'+
+         '<text x="60" y="66" text-anchor="middle" fill="#dfe9ff" font-size="24" font-family="Orbitron">'+sec.toFixed(1)+'</text>';
+}
+function renderAuctionPlayer(){
+  const p=auctionState.current;
+  const n=document.getElementById("aucPlayer"),m=document.getElementById("aucMeta"),r=document.getElementById("countRing");
+  if(!n||!m||!r) return;
+  if(!p){n.textContent="No player";m.textContent="Click Next Player";r.innerHTML=ringSVG(0);return;}
+  n.textContent=p.emoji+" "+pn(p);
+  m.textContent=p.role+" · "+p.country+" · Base ₹"+(p.baseL/100).toFixed(2)+"Cr";
+  r.innerHTML=ringSVG(auctionView.timeLeft||5);
+}
+function stopAuctionTimer(){ if(auctionView.timer){clearInterval(auctionView.timer);auctionView.timer=null;} auctionView.running=false; }
+function startAuctionClock(){
+  stopAuctionTimer(); auctionView.running=true; auctionView.timeLeft=5;
+  renderAuctionPlayer();
+  auctionView.timer=setInterval(function(){
+    auctionView.timeLeft=Math.max(0,auctionView.timeLeft-0.1);
+    renderAuctionPlayer();
+    if(auctionView.timeLeft<=0){
+      stopAuctionTimer();
+      if(auctionView.bidTeam){
+        sellCurrent(auctionView.bidTeam,auctionView.bidPrice);
+        auctionView.log.push("SOLD: "+pn(auctionState.current)+" to "+auctionView.bidTeam+" for ₹"+(auctionView.bidPrice/100).toFixed(2)+"Cr");
+      }else{
+        unsoldCurrent();
+        auctionView.log.push("UNSOLD: "+pn(auctionState.current));
+      }
+      renderAuctionPurse();renderAuctionLog();
+    }
+  },100);
+}
+function aucNext(){
+  const p=nextAuctionPlayer();
+  auctionView.bidTeam=""; auctionView.bidPrice=(p?p.baseL:0);
+  renderAuctionPlayer();renderAuctionPurse();renderAuctionLog();
+  if(p){auctionView.log.push("LOT: "+pn(p)+" ("+p.role+") base ₹"+(p.baseL/100).toFixed(2)+"Cr");renderAuctionLog();startAuctionClock();}
+  else toast("Auction complete","ok");
+}
+function aucBid(){
+  const p=auctionState.current; if(!p){toast("No active player","err");return;}
+  const mine=myTeam||auctionState.teams[0];
+  if((auctionState.purse[mine]||0)<(auctionView.bidPrice+10)){toast("Insufficient purse","err");return;}
+  auctionView.bidPrice+=10; auctionView.bidTeam=mine; auctionView.log.push(mine+" bids ₹"+(auctionView.bidPrice/100).toFixed(2)+"Cr");
+  // AI counter
+  const ai=aiBidNext(auctionView.bidPrice,p);
+  if(ai){auctionView.bidPrice+=10;auctionView.bidTeam=ai;auctionView.log.push(ai+" bids ₹"+(auctionView.bidPrice/100).toFixed(2)+"Cr");}
+  auctionView.timeLeft=5; renderAuctionPlayer(); renderAuctionLog();
+}
+function aucSkipPlayer(){ skipCurrent(); auctionView.log.push("SKIPPED: "+pn(auctionState.current)); stopAuctionTimer(); renderAuctionLog(); }
+function aucUnsold(){ unsoldCurrent(); auctionView.log.push("UNSOLD: "+pn(auctionState.current)); stopAuctionTimer(); renderAuctionLog(); }
+
+/* ---------- MODE ROUTING FINAL ---------- */
+const _goModeP3 = goMode;
+goMode = function(m){
+  if(m==="mini"){auctionInit("mini");openAuctionScreen();return;}
+  if(m==="mega"){auctionInit("mega");openAuctionScreen();return;}
+  if(m==="season"){_goModeP3(m); setTimeout(function(){openSeasonScreen();},120); return;}
+  _goModeP3(m);
+};
+
+/* ---------- USER GESTURE AUDIO UNLOCK ---------- */
+document.body.addEventListener("pointerdown",function(){ if(!SFX.ctx) sfxInit(); if(SFX.ctx&&SFX.ctx.state==="suspended") SFX.ctx.resume(); },{once:false});
+
+/* ---------- FINAL INIT ---------- */
+(function initPart3(){
+  // keep previous init behavior
+  if(gameMode==="season" && seasonData.fixtures.length===0) seasonInit(myTeam||"CSK");
+})();
+
+/* ===== PART 3 PATCH END ===== */
+  </script>
+</body>
+</html>
