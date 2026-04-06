@@ -443,6 +443,192 @@ function buildStats(){return GA.records||{};}
 document.body.addEventListener("pointerdown",function(){if(!SFX.ctx)sfxInit();if(SFX.ctx&&SFX.ctx.state==="suspended")SFX.ctx.resume();},{once:false});
 
 seasonInit();buildTeamGrid();
+    /* ===== GAMEPLAY UX PATCH ===== */
+
+/* pacing + visuals */
+let paceMs = 900;              // default slower
+let preBallDelayMs = 350;      // small anticipation
+let waitingUserChoice = false; // pause states
+let forceBowlerSelect = false; // after over
+let pendingWicket = false;     // after wicket
+
+/* expand squads to full 25 with generated bench (until full real data added) */
+function ensureFull25Squads(){
+  const roles = ["bat","bat","wk","all","spin","bowl","bowl","all","bat","spin"];
+  for(let ti=0; ti<IPL_META.length; ti++){
+    const k = IPL_META[ti].k;
+    if(!IPL2026[k]) IPL2026[k] = [];
+    while(IPL2026[k].length < 25){
+      const r = roles[IPL2026[k].length % roles.length];
+      IPL2026[k].push(mkP(
+        k+" Bench "+(IPL2026[k].length+1),
+        r,
+        (Math.random()<0.35?"LHB":"RHB"),
+        r==="bowl"||r==="spin" ? rndi(10,35) : rndi(62,82),
+        r==="bowl"||r==="spin"||r==="all" ? rndi(62,84) : rndi(1,20),
+        +(rnd(18,33).toFixed(1)),
+        +(rnd(118,152).toFixed(0)),
+        r==="bowl"||r==="spin"||r==="all" ? +(rnd(20,33).toFixed(1)) : 0,
+        r==="bowl"||r==="spin"||r==="all" ? +(rnd(6.7,9.1).toFixed(1)) : 0,
+        r==="bowl"||r==="spin"||r==="all" ? rndi(20,160) : null,
+        rndi(25,160),
+        r==="bowl"||r==="spin"||r==="all" ? rndi(40,520) : 0,
+        rndi(2,4),
+        rndi(76,95),
+        false,
+        (Math.random()<0.22)
+      ));
+    }
+  }
+}
+
+/* better team selection visibility */
+function buildTeamGridBetter(){
+  const g=document.getElementById("teamGrid"); if(!g) return;
+  g.innerHTML="";
+  for(let i=0;i<IPL_META.length;i++){
+    const t=IPL_META[i];
+    const b=document.createElement("button");
+    b.className="team-chip";
+    b.style.background=`linear-gradient(135deg, ${t.c1}55, ${t.c2}55)`;
+    b.style.border=`2px solid ${t.c2}`;
+    b.style.color="#fff";
+    b.style.textShadow="0 1px 2px #000";
+    b.innerHTML = `<div style="font-weight:800">${t.k}</div><div class="small">${t.n}</div>`;
+    b.onclick=((k)=>()=>chooseTeam(k))(t.k);
+    g.appendChild(b);
+  }
+}
+
+/* slower autoplay + start prompt */
+function showMatchStartPrompt(){
+  const ok = confirm("Start in Classic pace?\nOK = Normal slow\nCancel = Fast mode");
+  if(ok){ paceMs=900; preBallDelayMs=350; }
+  else { paceMs=280; preBallDelayMs=80; }
+}
+const _autoLoopOld = autoLoop;
+autoLoop = function(){
+  stopAll();
+  const step = function(){
+    if(!autoPlay) return;
+    if(waitingUserChoice) { autoTimer=setTimeout(step,180); return; }
+    if((innings===2&&(wk2>=10||balls2>=120||score2>target))) return;
+    setTimeout(function(){ simBall(); }, preBallDelayMs);
+    let d = paceMs;
+    if(highLights){
+      const last=commBalls[commBalls.length-1]||".";
+      d = (last==="4"||last==="6"||last==="W") ? 1400 : paceMs;
+    }
+    autoTimer=setTimeout(step,d);
+  };
+  autoTimer=setTimeout(step,200);
+};
+
+/* aggression/defense +/- 5 meter scale */
+let shotMeter = 0; // -5 defensive to +5 aggressive
+function setShotMeter(delta){
+  shotMeter = clamp(shotMeter + delta, -5, 5);
+  aggr = clamp(5 + shotMeter, 1, 10);
+  defensive = clamp(5 - shotMeter, 0, 10);
+  const lbl = document.getElementById("aggrLabel");
+  if(lbl) lbl.textContent = "Shot Meter " + (shotMeter>0?`+${shotMeter}`:shotMeter);
+}
+window.setAggr = function(d){ setShotMeter(d>0?1:-1); };
+
+/* bowler change after every over */
+function chooseBowlerModal(){
+  waitingUserChoice = true;
+  const pool=(innings===1?G.aiBowl:G.myBowl);
+  let msg="Choose next bowler index:\n";
+  for(let i=0;i<Math.min(pool.length,11);i++){
+    const o=bowlerOvers[i]||0;
+    msg += `${i}: ${pn(pool[i])} (${o}.0 ov)\n`;
+  }
+  const ans=prompt(msg, String(pickNextBowler()));
+  let idx=parseInt(ans,10);
+  if(Number.isNaN(idx)||idx<0||idx>=pool.length||idx===prevBowlerIdx||(bowlerOvers[idx]||0)>=4){
+    idx=pickNextBowler();
+  }
+  currentBowlerIdx=idx;
+  waitingUserChoice = false;
+  updatePanels();
+}
+const _endOverOld = endOver;
+endOver = function(){
+  bowlerOvers[currentBowlerIdx]=(bowlerOvers[currentBowlerIdx]||0)+1;
+  bowlerStam[currentBowlerIdx]=clamp((bowlerStam[currentBowlerIdx]||100)-7,30,100);
+  prevBowlerIdx=currentBowlerIdx;
+  if(!autoPlay){ currentBowlerIdx=pickNextBowler(); updatePanels(); return; }
+  chooseBowlerModal();
+  if(innings===2 && !M.meBatFirst && Math.floor(balls2/6)===6){
+    toast("Powerplay ended! Set your field");
+    openField();
+  }
+};
+
+/* next batter selection on wicket */
+function chooseNextBatterModal(){
+  const batTeam=(innings===1?G.myBat:G.aiBat);
+  let msg="Wicket! Select next batter index:\n";
+  for(let i=0;i<batTeam.length;i++){
+    const p=batTeam[i];
+    const used = (i<nextBatIdx && i!==striker && i!==nonStriker);
+    msg += `${i}: ${pn(p)} ${used?"(out/used)":""}\n`;
+  }
+  const ans=prompt(msg, String(nextBatIdx));
+  let idx=parseInt(ans,10);
+  if(Number.isNaN(idx)||idx<0||idx>=batTeam.length||idx===striker||idx===nonStriker||idx<nextBatIdx){
+    idx=nextBatIdx;
+  }
+  return idx;
+}
+const _applyBallOld = applyBall;
+applyBall = function(out,runs,isW,isExtra,bat,bowl){
+  const isFirst=(innings===1);
+  if(isFirst){score1+=runs;if(!isExtra)balls1++;} else {score2+=runs;if(!isExtra)balls2++;}
+  bowlerRuns[currentBowlerIdx]=(bowlerRuns[currentBowlerIdx]||0)+runs;
+
+  if(!isExtra){
+    if(isW){
+      if(isFirst)wk1++; else wk2++;
+      bowlerWkts[currentBowlerIdx]=(bowlerWkts[currentBowlerIdx]||0)+1;
+      waitingUserChoice=true;
+      let nb = chooseNextBatterModal();
+      striker = nb;
+      if(nb>=nextBatIdx) nextBatIdx = nb+1;
+      waitingUserChoice=false;
+      if(!impactUsed){impactUsed=true;toast("IMPACT player window available","ok");}
+    } else {
+      if(out==="1"||out==="3"){const t=striker;striker=nonStriker;nonStriker=t;}
+      const p=(innings===1?G.myBat:G.aiBat)[striker];
+      if(p){p._r=(p._r||0)+runs;p._b=(p._b||0)+1;}
+    }
+    if(((isFirst?balls1:balls2)%6)===0){const t2=striker;striker=nonStriker;nonStriker=t2;endOver();}
+  }
+  addComm(out); updatePanels(); updateScorebar(); renderComm();
+  const bb=isFirst?balls1:balls2;
+  if((isFirst&&(wk1>=10||bb>=120))||(!isFirst&&(wk2>=10||bb>=120||score2>target))) endInningsOrMatch();
+};
+
+/* smoother tiny animation on scoreboard updates */
+const _updScoreOld = updateScorebar;
+updateScorebar = function(){
+  _updScoreOld();
+  const mid=document.getElementById("sbMid");
+  if(mid){
+    mid.style.transition="transform .14s ease";
+    mid.style.transform="scale(1.06)";
+    setTimeout(()=>{mid.style.transform="scale(1)";},120);
+  }
+};
+
+/* init patch */
+(function gameplayPatchInit(){
+  ensureFull25Squads();
+  buildTeamGridBetter();
+  showMatchStartPrompt();
+  toast("Gameplay patch loaded: slower pace, full squads, picker modals, better visibility","ok");
+})();
 </script>
 </body>
 </html>
